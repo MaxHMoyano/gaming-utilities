@@ -2,7 +2,7 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-client.login(process.env.token);
+client.login(process.env.TOKEN);
 let voiceCategory;
 let createPartyChannel;
 let videogamesBeingPlayed = [];
