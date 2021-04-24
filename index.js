@@ -5,7 +5,7 @@ const client = new Discord.Client();
 client.login(process.env.TOKEN);
 let voiceCategory;
 let createPartyChannel;
-let videogamesBeingPlayed = []; // list of videogames which will be added
+let videogamesBeingPlayed = [];
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
