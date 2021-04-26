@@ -13,7 +13,7 @@ client.on('ready', async () => {
     // Encuentro la categoria de voz
     return channel.id === '377818324559593486';
   });
-  createPartyChannel = await voiceCategory.guild.channels.create('Crear Party', {
+  createPartyChannel = await voiceCategory.guild.channels.create('〔🤖〕Crear Party', {
     type: 'voice',
     userLimit: 1,
     parent: voiceCategory,
