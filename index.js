@@ -1,3 +1,5 @@
+// TODO: Change order to be above AFK channel
+
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -17,30 +19,34 @@ client.on('ready', async () => {
     type: 'voice',
     userLimit: 1,
     parent: voiceCategory,
+    position: 2,
   });
 });
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
-  if (newState.channel.id === createPartyChannel.id) {
+  if (newState.channel && newState.channel.id === createPartyChannel.id) {
     //User enters crear party
     let videogames = newState.member.presence.activities.filter(
       (activity) => activity.type === 'PLAYING',
     );
     let channelName = videogames.length
       ? videogames[0].name
-      : `〔🔊〕Nueva Party de ${newState.member.nickname}`;
+      : `〔🔊〕Party de ${newState.member.nickname || newState.member.displayName}`;
     let newChannel = await newState.guild.channels.create(channelName, {
       type: 'voice',
       parent: voiceCategory,
+      position: 2,
     });
     newState.member.voice.setChannel(newChannel);
     videogamesBeingPlayed.push(newChannel);
   }
 
   // User se va de un canal creado
-  let createdChannel = videogamesBeingPlayed.find((e) => e.id === oldState.channel.id);
-  if (createdChannel && createdChannel.members.toJSON().length === 0) {
-    createdChannel.delete();
-    videogamesBeingPlayed = videogamesBeingPlayed.filter((e) => e.id !== createdChannel.id);
+  if (oldState.channel) {
+    let createdChannel = videogamesBeingPlayed.find((e) => e.id === oldState.channel.id);
+    if (createdChannel && createdChannel.members.toJSON().length === 0) {
+      createdChannel.delete();
+      videogamesBeingPlayed = videogamesBeingPlayed.filter((e) => e.id !== createdChannel.id);
+    }
   }
 });
