@@ -1,5 +1,3 @@
-// TODO: Change order to be above AFK channel
-
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
