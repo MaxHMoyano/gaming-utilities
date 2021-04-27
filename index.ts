@@ -87,23 +87,26 @@ const checkChannelName = (channel: Discord.GuildChannel): void => {
   let videogames: Videogame[];
   channel.members.forEach((member) => {
     let memberGames = member.presence.activities.filter((activity) => activity.type === 'PLAYING');
-    activities.push(...memberGames);
-  });
-  activities.forEach((activity) => {
-    let gameIdx = videogames.findIndex((videogame) => videogame.id === activity.applicationID);
-    if (gameIdx !== -1) {
-      videogames[gameIdx].count++;
-    } else {
-      videogames.push({
-        name: activity.name,
-        id: activity.applicationID,
-        count: 0,
-      });
+    if (memberGames.length) {
+      activities.push(...memberGames);
     }
   });
-
-  let videogameMostPlayed = checkVideogameCount(videogames);
-  channel.edit({ name: videogameMostPlayed.name });
+  if (activities.length) {
+    activities.forEach((activity) => {
+      let gameIdx = videogames.findIndex((videogame) => videogame.id === activity.applicationID);
+      if (gameIdx !== -1) {
+        videogames[gameIdx].count++;
+      } else {
+        videogames.push({
+          name: activity.name,
+          id: activity.applicationID,
+          count: 0,
+        });
+      }
+    });
+    let videogameMostPlayed = checkVideogameCount(videogames);
+    channel.edit({ name: videogameMostPlayed.name });
+  }
 };
 
 const checkVideogameCount = (videogames: Videogame[]) => {
