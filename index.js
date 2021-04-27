@@ -5,7 +5,7 @@ const client = new Discord.Client();
 client.login(process.env.TOKEN);
 let voiceCategory;
 let createPartyChannel;
-let videogamesBeingPlayed = [];
+let createdChannels = [];
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -44,15 +44,39 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
       position: 2,
     });
     newState.member.voice.setChannel(newChannel);
-    videogamesBeingPlayed.push(newChannel);
+    createdChannels.push(newChannel);
   }
 
   // User se va de un canal creado
   if (oldState.channel) {
-    let createdChannel = videogamesBeingPlayed.find((e) => e.id === oldState.channel.id);
-    if (createdChannel && createdChannel.members.toJSON().length === 0) {
-      createdChannel.delete();
-      videogamesBeingPlayed = videogamesBeingPlayed.filter((e) => e.id !== createdChannel.id);
+    let channel = createdChannels.find((e) => e.id === oldState.channel.id);
+    if (channel && channel.members.toJSON().length === 0) {
+      channel.delete();
+      createdChannels = createdChannels.filter((e) => e.id !== channel.id);
+    }
+  }
+});
+
+client.on('presenceUpdate', (oldPresence, newPresence) => {
+  let member = oldPresence.member || null;
+  let memberInCreatedChannel;
+  let channelToBeChanged;
+  if (member) {
+    createdChannels.forEach((channel) => {
+      memberInCreatedChannel = channel.members.array().find((e) => e.id === member.id);
+      if (memberInCreatedChannel) {
+        channelToBeChanged = channel;
+      }
+    });
+    if (memberInCreatedChannel) {
+      if (memberInCreatedChannel.presence.activities.length) {
+        let videogame = memberInCreatedChannel.presence.activities.find(
+          (e) => e.type === 'PLAYING',
+        );
+        if (videogame) {
+          channelToBeChanged.edit({ name: videogame.name });
+        }
+      }
     }
   }
 });
