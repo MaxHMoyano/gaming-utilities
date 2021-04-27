@@ -13,12 +13,20 @@ client.on('ready', async () => {
     // Encuentro la categoria de voz
     return channel.id === '377818324559593486';
   });
-  createPartyChannel = await voiceCategory.guild.channels.create('〔🤖〕Crear Party', {
-    type: 'voice',
-    userLimit: 1,
-    parent: voiceCategory,
-    position: 2,
-  });
+  let isChannelAlreadyCreated = voiceCategory.guild.channels.cache.find(
+    (channel) => channel.name === '〔🤖〕Crear Party',
+  );
+
+  if (!isChannelAlreadyCreated) {
+    createPartyChannel = await voiceCategory.guild.channels.create('〔🤖〕Crear Party', {
+      type: 'voice',
+      userLimit: 1,
+      parent: voiceCategory,
+      position: 2,
+    });
+  } else {
+    createPartyChannel = isChannelAlreadyCreated;
+  }
 });
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
