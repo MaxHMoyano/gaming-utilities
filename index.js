@@ -1,7 +1,6 @@
 "use strict";
 // TODO: Make the channel name of the majority of players. Not just the last one
 // TODO: function to check a server name by counting people playing
-// TODO: Migrate to typescript
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {

@@ -1,6 +1,5 @@
 // TODO: Make the channel name of the majority of players. Not just the last one
 // TODO: function to check a server name by counting people playing
-// TODO: Migrate to typescript
 
 import * as dotenv from 'dotenv';
 import * as Discord from 'discord.js';
