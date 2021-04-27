@@ -47,14 +47,13 @@ var voiceCategory;
 var createPartyChannel;
 var createdChannels = [];
 client.on('ready', function () { return __awaiter(void 0, void 0, void 0, function () {
-    var isChannelAlreadyCreated;
+    var server, isChannelAlreadyCreated;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 console.log("Logged in as " + client.user.tag + "!");
-                console.log(client);
-                voiceCategory = client.channels.cache.find(function (channel) {
-                    // Encuentro la categoria de voz
+                server = client.guilds.cache.first();
+                voiceCategory = server.channels.cache.find(function (channel) {
                     return channel.id === '377818324559593486';
                 });
                 isChannelAlreadyCreated = voiceCategory.guild.channels.cache.find(function (channel) { return channel.name === '〔🤖〕Crear Party'; });
@@ -99,7 +98,7 @@ client.on('voiceStateUpdate', function (oldState, newState) { return __awaiter(v
                 // User se va de un canal creado
                 if (oldState.channel) {
                     channel_1 = createdChannels.find(function (e) { return e.id === oldState.channel.id; });
-                    if (channel_1 && channel_1.members.toJSON().length === 0) {
+                    if (channel_1 && channel_1.members.array().length === 0) {
                         channel_1["delete"]();
                         createdChannels = createdChannels.filter(function (e) { return e.id !== channel_1.id; });
                     }
@@ -108,7 +107,7 @@ client.on('voiceStateUpdate', function (oldState, newState) { return __awaiter(v
         }
     });
 }); });
-client.on('presenceUpdate', function (oldPresence, newPresence) {
+client.on('presenceUpdate', function (oldPresence) {
     if (oldPresence) {
         var member_1 = oldPresence.member;
         var memberInCreatedChannel_1;
@@ -121,14 +120,42 @@ client.on('presenceUpdate', function (oldPresence, newPresence) {
                 }
             });
             if (memberInCreatedChannel_1) {
-                if (memberInCreatedChannel_1.presence.activities.length) {
-                    var videogame = memberInCreatedChannel_1.presence.activities.find(function (e) { return e.type === 'PLAYING'; });
-                    if (videogame) {
-                        channelToBeChanged_1.edit({ name: videogame.name });
-                    }
-                }
+                checkChannelName(channelToBeChanged_1);
             }
         }
     }
 });
-var checkChannelName = function (channel) { };
+var checkChannelName = function (channel) {
+    var activities;
+    var videogames;
+    channel.members.forEach(function (member) {
+        var memberGames = member.presence.activities.filter(function (activity) { return activity.type === 'PLAYING'; });
+        activities.push.apply(activities, memberGames);
+    });
+    activities.forEach(function (activity) {
+        var gameIdx = videogames.findIndex(function (videogame) { return videogame.id === activity.applicationID; });
+        if (gameIdx !== -1) {
+            videogames[gameIdx].count++;
+        }
+        else {
+            videogames.push({
+                name: activity.name,
+                id: activity.applicationID,
+                count: 0
+            });
+        }
+    });
+    var videogameMostPlayed = checkVideogameCount(videogames);
+    channel.edit({ name: videogameMostPlayed.name });
+};
+var checkVideogameCount = function (videogames) {
+    var mostPlayed = {
+        count: 0
+    };
+    videogames.forEach(function (videogame) {
+        if (videogame.count > mostPlayed.count) {
+            mostPlayed = videogame;
+        }
+    });
+    return mostPlayed;
+};
