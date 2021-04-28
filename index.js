@@ -1,161 +1,130 @@
 "use strict";
 // TODO: Make the channel name of the majority of players. Not just the last one
 // TODO: function to check a server name by counting people playing
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-var dotenv = require("dotenv");
-var Discord = require("discord.js");
-var client = new Discord.Client();
+Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv = __importStar(require("dotenv"));
+const Discord = __importStar(require("discord.js"));
+const client = new Discord.Client();
 dotenv.config();
 client.login(process.env.TOKEN);
-var voiceCategory;
-var createPartyChannel;
-var createdChannels = [];
-client.on('ready', function () { return __awaiter(void 0, void 0, void 0, function () {
-    var server, isChannelAlreadyCreated;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                console.log("Logged in as " + client.user.tag + "!");
-                server = client.guilds.cache.first();
-                voiceCategory = server.channels.cache.find(function (channel) {
-                    return channel.id === '377818324559593486';
-                });
-                isChannelAlreadyCreated = voiceCategory.guild.channels.cache.find(function (channel) { return channel.name === '〔🤖〕Crear Party'; });
-                if (!!isChannelAlreadyCreated) return [3 /*break*/, 2];
-                return [4 /*yield*/, voiceCategory.guild.channels.create('〔🤖〕Crear Party', {
-                        type: 'voice',
-                        userLimit: 1,
-                        parent: voiceCategory,
-                        position: 2
-                    })];
-            case 1:
-                createPartyChannel = _a.sent();
-                return [3 /*break*/, 3];
-            case 2:
-                createPartyChannel = isChannelAlreadyCreated;
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+let voiceCategory;
+let createPartyChannel;
+let createdChannels = [];
+const checkChannelName = (channel) => {
+    let activities = [];
+    let videogames = [];
+    channel?.members.forEach((member) => {
+        let memberGames = member.presence.activities.filter((activity) => activity.type === 'PLAYING');
+        if (memberGames.length) {
+            activities.push(...memberGames);
         }
     });
-}); });
-client.on('voiceStateUpdate', function (oldState, newState) { return __awaiter(void 0, void 0, void 0, function () {
-    var videogames, channelName, newChannel, channel_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!(newState.channel && newState.channel.id === createPartyChannel.id)) return [3 /*break*/, 2];
-                videogames = newState.member.presence.activities.filter(function (activity) { return activity.type === 'PLAYING'; });
-                channelName = videogames.length
-                    ? videogames[0].name
-                    : "\u3014\uD83D\uDD0A\u3015Party de " + (newState.member.nickname || newState.member.displayName);
-                return [4 /*yield*/, newState.guild.channels.create(channelName, {
-                        type: 'voice',
-                        parent: voiceCategory,
-                        position: 2
-                    })];
-            case 1:
-                newChannel = _a.sent();
-                newState.member.voice.setChannel(newChannel);
-                createdChannels.push(newChannel);
-                _a.label = 2;
-            case 2:
-                // User se va de un canal creado
-                if (oldState.channel) {
-                    channel_1 = createdChannels.find(function (e) { return e.id === oldState.channel.id; });
-                    if (channel_1 && channel_1.members.array().length === 0) {
-                        channel_1["delete"]();
-                        createdChannels = createdChannels.filter(function (e) { return e.id !== channel_1.id; });
-                    }
-                }
-                return [2 /*return*/];
-        }
-    });
-}); });
-client.on('presenceUpdate', function (oldPresence) {
-    if (oldPresence) {
-        var member_1 = oldPresence.member;
-        var memberInCreatedChannel_1;
-        var channelToBeChanged_1;
-        if (member_1) {
-            createdChannels.forEach(function (channel) {
-                memberInCreatedChannel_1 = channel.members.array().find(function (e) { return e.id === member_1.id; });
-                if (memberInCreatedChannel_1) {
-                    channelToBeChanged_1 = channel;
-                }
-            });
-            if (memberInCreatedChannel_1) {
-                checkChannelName(channelToBeChanged_1);
+    if (activities.length) {
+        activities.forEach((activity) => {
+            let gameIdx = videogames.findIndex((videogame) => videogame.id === activity.applicationID);
+            if (gameIdx !== -1) {
+                videogames[gameIdx].count++;
             }
-        }
+            else {
+                videogames.push({
+                    name: activity.name,
+                    id: activity.applicationID,
+                    count: 1,
+                });
+            }
+        });
+        let videogameMostPlayed = checkVideogameCount(videogames);
+        channel?.edit({ name: videogameMostPlayed.name });
     }
-});
-var checkChannelName = function (channel) {
-    var activities;
-    var videogames;
-    channel.members.forEach(function (member) {
-        var memberGames = member.presence.activities.filter(function (activity) { return activity.type === 'PLAYING'; });
-        activities.push.apply(activities, memberGames);
-    });
-    activities.forEach(function (activity) {
-        var gameIdx = videogames.findIndex(function (videogame) { return videogame.id === activity.applicationID; });
-        if (gameIdx !== -1) {
-            videogames[gameIdx].count++;
-        }
-        else {
-            videogames.push({
-                name: activity.name,
-                id: activity.applicationID,
-                count: 0
-            });
-        }
-    });
-    var videogameMostPlayed = checkVideogameCount(videogames);
-    channel.edit({ name: videogameMostPlayed.name });
 };
-var checkVideogameCount = function (videogames) {
-    var mostPlayed = {
-        count: 0
+const checkVideogameCount = (videogames) => {
+    let mostPlayed = {
+        count: 0,
     };
-    videogames.forEach(function (videogame) {
+    videogames.forEach((videogame) => {
         if (videogame.count > mostPlayed.count) {
             mostPlayed = videogame;
         }
     });
     return mostPlayed;
 };
+client.on('ready', async () => {
+    console.log(`Logged in`);
+    let server = client.guilds.cache.first();
+    voiceCategory = server?.channels.cache.find((channel) => {
+        return channel.id === '377818324559593486';
+    });
+    let isChannelAlreadyCreated = voiceCategory?.guild.channels.cache.find((channel) => channel.name === '〔🤖〕Crear Party');
+    if (!isChannelAlreadyCreated) {
+        createPartyChannel = await voiceCategory?.guild.channels.create('〔🤖〕Crear Party', {
+            type: 'voice',
+            userLimit: 1,
+            parent: voiceCategory,
+            position: 2,
+        });
+    }
+    else {
+        createPartyChannel = isChannelAlreadyCreated;
+    }
+});
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    if (newState.channel && newState.channel.id === createPartyChannel?.id) {
+        //User enters crear party
+        let videogames = newState.member?.presence.activities.filter((activity) => activity.type === 'PLAYING');
+        let channelName = videogames?.length
+            ? videogames[0].name
+            : `〔🔊〕Party de ${newState.member?.nickname || newState.member?.displayName}`;
+        let newChannel = await newState.guild.channels.create(channelName, {
+            type: 'voice',
+            parent: voiceCategory,
+            position: 2,
+        });
+        newState.member?.voice.setChannel(newChannel);
+        createdChannels.push(newChannel);
+    }
+    // User se va de un canal creado
+    if (oldState.channel) {
+        let channel = createdChannels.find((e) => e.id === oldState.channel?.id);
+        if (channel && channel.members.array().length === 0) {
+            channel.delete();
+            createdChannels = createdChannels.filter((e) => e.id !== channel?.id);
+        }
+    }
+});
+client.on('presenceUpdate', (oldPresence) => {
+    if (oldPresence) {
+        let member = oldPresence.member;
+        let memberInCreatedChannel;
+        let channelToBeChanged = null;
+        if (member) {
+            createdChannels.forEach((channel) => {
+                memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
+                if (memberInCreatedChannel) {
+                    channelToBeChanged = channel;
+                }
+            });
+            if (memberInCreatedChannel) {
+                checkChannelName(channelToBeChanged);
+            }
+        }
+    }
+});
