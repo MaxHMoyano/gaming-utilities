@@ -24,10 +24,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 const discord_js_1 = require("discord.js");
-const gamingchannel_1 = __importDefault(require("./components/gamingchannel"));
 const autoRol_1 = __importDefault(require("./components/autoRol"));
 const client = new discord_js_1.Client();
 dotenv.config();
 client.login(process.env.TOKEN);
-gamingchannel_1.default.init(client);
+// gamingChannel.init(client);
 autoRol_1.default.init(client);

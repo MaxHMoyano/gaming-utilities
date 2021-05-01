@@ -7,5 +7,5 @@ const client = new Client();
 dotenv.config();
 client.login(process.env.TOKEN);
 
-gamingChannel.init(client);
+// gamingChannel.init(client);
 autoRol.init(client);

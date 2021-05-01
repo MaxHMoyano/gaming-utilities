@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMostPlayedVideogameFromList = exports.isMemberPartOfChannelList = exports.getChannelPlayedVideogames = exports.findVoiceCategory = exports.findServer = void 0;
+exports.getMostPlayedVideogameFromList = exports.isMemberPartOfChannelList = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = void 0;
 const findServer = (client) => {
-    return client.guilds.cache.first();
+    return client?.guilds.cache.first();
 };
 exports.findServer = findServer;
 const findVoiceCategory = (server) => {
@@ -11,6 +11,30 @@ const findVoiceCategory = (server) => {
     });
 };
 exports.findVoiceCategory = findVoiceCategory;
+const findBotCategory = (server) => {
+    return server?.channels.cache.find((channel) => {
+        return channel.id === '733385675986173984';
+    });
+};
+exports.findBotCategory = findBotCategory;
+const isTextChannelAlreadyCreated = (server, name) => {
+    let channel = server?.channels.cache.find((e) => e.name === name);
+    return channel;
+};
+exports.isTextChannelAlreadyCreated = isTextChannelAlreadyCreated;
+const deleteOldMessagesFromChannel = async (channel) => {
+    if (channel) {
+        const previousMessages = await channel?.messages.fetch();
+        if (previousMessages) {
+            channel?.bulkDelete(previousMessages);
+        }
+    }
+};
+exports.deleteOldMessagesFromChannel = deleteOldMessagesFromChannel;
+const getEmojiByName = (server, iconName) => {
+    return server?.emojis.cache.find((e) => e.name === iconName);
+};
+exports.getEmojiByName = getEmojiByName;
 const getChannelPlayedVideogames = (channel) => {
     let videogames = [];
     let activities = [];
@@ -64,6 +88,10 @@ exports.getMostPlayedVideogameFromList = getMostPlayedVideogameFromList;
 exports.default = {
     findServer: exports.findServer,
     findVoiceCategory: exports.findVoiceCategory,
+    findBotCategory: exports.findBotCategory,
+    getEmojiByName: exports.getEmojiByName,
+    isTextChannelAlreadyCreated: exports.isTextChannelAlreadyCreated,
+    deleteOldMessagesFromChannel: exports.deleteOldMessagesFromChannel,
     getChannelPlayedVideogames: exports.getChannelPlayedVideogames,
     getMostPlayedVideogameFromList: exports.getMostPlayedVideogameFromList,
 };

@@ -3,3 +3,10 @@ export interface Videogame {
   name?: string;
   count: number;
 }
+
+export interface PartialRole {
+  id: string;
+  name: string;
+  icon: string;
+  displayName: string;
+}
