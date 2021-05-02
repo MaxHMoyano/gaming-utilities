@@ -9,11 +9,11 @@ const readyEvent = async (
   voiceCategory = findVoiceCategory(server);
 
   let isChannelAlreadyCreated = voiceCategory?.guild.channels.cache.find(
-    (channel) => channel.name === '〔🤖〕Crear Party',
+    (channel) => channel.name === '🤖︱Crear Party',
   );
 
   if (!isChannelAlreadyCreated) {
-    createPartyChannel = await voiceCategory?.guild.channels.create('〔🤖〕Crear Party', {
+    createPartyChannel = await voiceCategory?.guild.channels.create('🤖︱Crear Party', {
       type: 'voice',
       userLimit: 1,
       parent: voiceCategory,
