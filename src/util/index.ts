@@ -1,14 +1,38 @@
-import { Client, Guild, Activity, GuildChannel, GuildMember, DiscordAPIError } from 'discord.js';
-import { Videogame } from '../classes';
+import { Client, Guild, Activity, GuildChannel, GuildMember, TextChannel } from 'discord.js';
+import { Videogame } from '../models';
+import GamingChannel from '../models/GamingChannel';
 
-export const findServer = (client: Client): Guild | undefined => {
-  return client.guilds.cache.first();
+export const findServer = (client?: Client): Guild | undefined => {
+  return client?.guilds.cache.first();
 };
 
 export const findVoiceCategory = (server?: Guild) => {
   return server?.channels.cache.find((channel) => {
     return channel.id === '377818324559593486';
   });
+};
+
+export const findBotCategory = (server?: Guild) => {
+  return server?.channels.cache.find((channel) => {
+    return channel.id === '733385675986173984';
+  });
+};
+
+export const isTextChannelAlreadyCreated = (server?: Guild, name?: string) => {
+  let channel = server?.channels.cache.find((e) => e.name === name) as TextChannel;
+  return channel;
+};
+export const deleteOldMessagesFromChannel = async (channel: TextChannel | undefined) => {
+  if (channel) {
+    const previousMessages = await channel?.messages.fetch();
+    if (previousMessages) {
+      channel?.bulkDelete(previousMessages);
+    }
+  }
+};
+
+export const getEmojiByName = (server: Guild | undefined, iconName: string) => {
+  return server?.emojis.cache.find((e) => e.name === iconName);
 };
 
 export const getChannelPlayedVideogames = (channel: GuildChannel) => {
@@ -38,12 +62,15 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
   return null;
 };
 
-export const isMemberPartOfChannelList = (
+export const isMemberPartOfCreatedChannels = async (
   member: GuildMember,
-  channelList: GuildChannel[],
-): [boolean, GuildChannel | null] => {
+): Promise<[boolean, GuildChannel | null]> => {
   let memberInCreatedChannel: GuildMember | undefined;
   let channelWithMember: GuildChannel | null = null;
+  let channelListDB = await GamingChannel.find({});
+  let channelList = channelListDB.map((channel) => {
+    return member.guild.channels.cache.get(channel.id) as GuildChannel;
+  });
   channelList.forEach((channel) => {
     memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
     channelWithMember = memberInCreatedChannel ? channel : null;
@@ -66,6 +93,10 @@ export const getMostPlayedVideogameFromList = (videogames: Videogame[]) => {
 export default {
   findServer,
   findVoiceCategory,
+  findBotCategory,
+  getEmojiByName,
+  isTextChannelAlreadyCreated,
+  deleteOldMessagesFromChannel,
   getChannelPlayedVideogames,
   getMostPlayedVideogameFromList,
 };

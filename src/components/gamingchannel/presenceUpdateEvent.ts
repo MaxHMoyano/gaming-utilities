@@ -1,28 +1,29 @@
-import { Presence, GuildChannel } from 'discord.js';
-import { Videogame } from '../../classes';
+import chalk from 'chalk';
+import { Presence } from 'discord.js';
+import { Videogame } from '../../models';
 import {
   getChannelPlayedVideogames,
-  isMemberPartOfChannelList,
+  isMemberPartOfCreatedChannels,
   getMostPlayedVideogameFromList,
 } from '../../util';
 
-const presenceUpdateEvent = (
-  oldPresence: Presence | undefined,
-  createdChannels: GuildChannel[],
-) => {
+const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   let member = oldPresence?.member;
   let videogames: Videogame[] | null = [];
   if (member) {
-    let [isMemberPartOfList, channel] = isMemberPartOfChannelList(member, createdChannels);
+    let [isMemberPartOfList, channel] = await isMemberPartOfCreatedChannels(member);
     if (isMemberPartOfList && channel) {
-      console.log(`A new member from ${channel.name} has changed their presence`);
+      console.log(
+        chalk.whiteBright(`A new member from ${channel.name} has changed their presence`),
+      );
       videogames = getChannelPlayedVideogames(channel);
     }
-    let mostPlayedVideogame: Videogame | null =
-      videogames && videogames.length ? getMostPlayedVideogameFromList(videogames) : null;
-    channel?.edit({ name: mostPlayedVideogame?.name }).then((editedChannel) => {
-      console.log(`Changed name of ${channel?.name} to ${editedChannel.name}`);
-    });
+    if (videogames && videogames.length) {
+      let mostPlayedVideogame: Videogame | null = getMostPlayedVideogameFromList(videogames);
+      channel?.edit({ name: mostPlayedVideogame?.name }).then((editedChannel) => {
+        console.log(chalk.cyanBright(`Changed name to ${editedChannel.name}`));
+      });
+    }
   }
 };
 

@@ -1,4 +1,5 @@
 import { Client, GuildChannel } from 'discord.js';
+import chalk from 'chalk';
 import readyEvent from './readyEvent';
 import voiceUpdateEvent from './voiceUpdateEvent';
 import presenceUpdateEvent from './presenceUpdateEvent';
@@ -6,8 +7,7 @@ import presenceUpdateEvent from './presenceUpdateEvent';
 const init = async (client: Client) => {
   let voiceCategory: GuildChannel | undefined;
   let createPartyChannel: GuildChannel | undefined;
-  let createdChannels: GuildChannel[] = [];
-  console.log('GamingChannel Init');
+  console.log(chalk.yellowBright('Module GamingChannels initiated'));
 
   // When the bot is ready and starts
   client.on('ready', async () => {
@@ -20,18 +20,12 @@ const init = async (client: Client) => {
 
   // Everytime a member changes from channel to channel
   client.on('voiceStateUpdate', async (oldState, newState) => {
-    createdChannels = await voiceUpdateEvent(
-      oldState,
-      newState,
-      voiceCategory,
-      createPartyChannel,
-      createdChannels,
-    );
+    await voiceUpdateEvent(oldState, newState, voiceCategory, createPartyChannel);
   });
 
   // Everytime a member updates their rich presence
   client.on('presenceUpdate', (oldPresence) => {
-    presenceUpdateEvent(oldPresence, createdChannels);
+    presenceUpdateEvent(oldPresence);
   });
 
   client.on('error', (err) => {});

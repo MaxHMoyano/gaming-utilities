@@ -1,29 +1,36 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, createPartyChannel, createdChannels) => {
+const chalk_1 = __importDefault(require("chalk"));
+const GamingChannel_1 = __importDefault(require("../../models/GamingChannel"));
+const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, createPartyChannel) => {
     if (newVoiceState.channel && newVoiceState.channel.id === createPartyChannel?.id) {
-        //User enters crear party
         let videogames = newVoiceState.member?.presence.activities.filter((activity) => activity.type === 'PLAYING');
         let channelName = videogames?.length
             ? videogames[0].name
-            : `〔🔊〕Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
+            : `🔊︱Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
         let newChannel = await newVoiceState.guild.channels.create(channelName, {
             type: 'voice',
             parent: voiceCategory,
             position: 2,
         });
-        console.log(`New channel ${newChannel.name} created`);
+        await GamingChannel_1.default.create({
+            name: newChannel.name,
+            _id: newChannel.id,
+        });
+        console.log(chalk_1.default.greenBright(`New channel ${newChannel.name} created`));
         newVoiceState.member?.voice.setChannel(newChannel);
-        createdChannels.push(newChannel);
     }
-    // User se va de un canal creado
     if (oldVoiceState.channel) {
-        let channel = createdChannels.find((e) => e.id === oldVoiceState.channel?.id);
+        let dbChannel = await GamingChannel_1.default.findById(oldVoiceState.channel.id);
+        let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.id);
         if (channel && channel.members.array().length === 0) {
-            channel.delete();
-            createdChannels = createdChannels.filter((e) => e.id !== channel?.id);
+            console.log(chalk_1.default.redBright(`Deleting ${channel.name}...`));
+            await GamingChannel_1.default.findByIdAndDelete(channel.id);
+            await channel.delete();
         }
     }
-    return createdChannels;
 };
 exports.default = voiceUpdateEvent;

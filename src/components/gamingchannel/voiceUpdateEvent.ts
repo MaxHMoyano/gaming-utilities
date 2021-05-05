@@ -1,40 +1,41 @@
 import { VoiceState, GuildChannel } from 'discord.js';
+import chalk from 'chalk';
+import GamingChannel from '../../models/GamingChannel';
 
 const voiceUpdateEvent = async (
   oldVoiceState: VoiceState,
   newVoiceState: VoiceState,
   voiceCategory: GuildChannel | undefined,
   createPartyChannel: GuildChannel | undefined,
-  createdChannels: GuildChannel[],
 ) => {
   if (newVoiceState.channel && newVoiceState.channel.id === createPartyChannel?.id) {
-    //User enters crear party
     let videogames = newVoiceState.member?.presence.activities.filter(
       (activity) => activity.type === 'PLAYING',
     );
     let channelName = videogames?.length
       ? videogames[0].name
-      : `〔🔊〕Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
+      : `🔊︱Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
     let newChannel = await newVoiceState.guild.channels.create(channelName, {
       type: 'voice',
       parent: voiceCategory,
       position: 2,
     });
-    console.log(`New channel ${newChannel.name} created`);
+    await GamingChannel.create({
+      name: newChannel.name,
+      _id: newChannel.id,
+    });
+    console.log(chalk.greenBright(`New channel ${newChannel.name} created`));
     newVoiceState.member?.voice.setChannel(newChannel);
-    createdChannels.push(newChannel);
   }
-
-  // User se va de un canal creado
   if (oldVoiceState.channel) {
-    let channel = createdChannels.find((e) => e.id === oldVoiceState.channel?.id);
+    let dbChannel = await GamingChannel.findById(oldVoiceState.channel.id);
+    let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.id);
     if (channel && channel.members.array().length === 0) {
-      channel.delete();
-      createdChannels = createdChannels.filter((e) => e.id !== channel?.id);
+      console.log(chalk.redBright(`Deleting ${channel.name}...`));
+      await GamingChannel.findByIdAndDelete(channel.id);
+      await channel.delete();
     }
   }
-
-  return createdChannels;
 };
 
 export default voiceUpdateEvent;
