@@ -16,7 +16,7 @@ const presenceUpdateEvent = async (oldPresence) => {
         }
         if (videogames && videogames.length) {
             let mostPlayedVideogame = util_1.getMostPlayedVideogameFromList(videogames);
-            channel?.edit({ name: mostPlayedVideogame?.name }).then((editedChannel) => {
+            channel?.edit({ name: `🔊︱${mostPlayedVideogame?.name}` }).then((editedChannel) => {
                 console.log(chalk_1.default.cyanBright(`Changed name to ${editedChannel.name}`));
             });
         }
