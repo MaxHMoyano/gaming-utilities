@@ -3,49 +3,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const chalk_1 = __importDefault(require("chalk"));
 const discord_js_1 = require("discord.js");
+const Rol_1 = __importDefault(require("../../models/Rol"));
 const util_1 = require("../../util");
-const roles_json_1 = __importDefault(require("./roles.json"));
 const init = async (client) => {
-    console.log('AutoRol Init');
+    console.log(chalk_1.default.yellowBright('Module AutoRol initiated'));
     let rolMessage;
-    let roles = roles_json_1.default;
     // When the bot is ready and starts
     client.on('ready', async () => {
         const server = util_1.findServer(client);
-        roles = populateRoleIds(server, roles);
-        rolMessage = await onReady(client, roles);
+        rolMessage = await onReady(server);
     });
     // Everytime a member reacts to a message
     client.on('messageReactionAdd', async (reaction, user) => {
         const server = util_1.findServer(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-            let roleIdToAdd = roles.find((role) => role.icon === reaction.emoji.name)?.id;
+            let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
             let guildUser = server?.members.cache.get(user.id);
-            let roleToAdd = server?.roles.cache.get(roleIdToAdd);
+            let roleToAdd = server?.roles.cache.get(dbRol?.id);
             guildUser?.roles.add(roleToAdd);
         }
     });
-    // Everytime a member reacts to a message
     client.on('messageReactionRemove', async (reaction, user) => {
         const server = util_1.findServer(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-            let roleIdToAdd = roles.find((role) => role.icon === reaction.emoji.name)?.id;
+            let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
             let guildUser = server?.members.cache.get(user.id);
-            let roleToAdd = server?.roles.cache.get(roleIdToAdd);
+            let roleToAdd = server?.roles.cache.get(dbRol?.id);
             guildUser?.roles.remove(roleToAdd);
         }
     });
-    // Everytime a member updates their rich presence
-    client.on('presenceUpdate', () => { });
-    // client.on('error', (err) => {});
+    // TODO: Parse a message to add roles to the list if we want to.
+    client.on('message', (message) => {
+        if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
+            if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
+                message.delete();
+            }
+        }
+    });
 };
 exports.default = {
     init,
 };
-const onReady = async (client, roles) => {
-    const server = util_1.findServer(client);
+const onReady = async (server) => {
     const botCategory = util_1.findBotCategory(server);
+    const roles = await Rol_1.default.find({});
     let name = 'elegi-tu-rol';
     let description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
     let textChannel = util_1.isTextChannelAlreadyCreated(server, name);
@@ -79,14 +82,5 @@ const createReactions = (message, server, roles) => {
         if (icon) {
             message?.react(icon?.id);
         }
-    });
-};
-const populateRoleIds = (server, roles) => {
-    return roles.map((role) => {
-        let guildRole = server?.roles.cache.find((e) => e.name === role.displayName);
-        return {
-            ...role,
-            id: guildRole?.id,
-        };
     });
 };

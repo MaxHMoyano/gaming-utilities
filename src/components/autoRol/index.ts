@@ -1,5 +1,6 @@
+import chalk from 'chalk';
 import { Client, Message, MessageEmbed, TextChannel, Guild, Role } from 'discord.js';
-import { PartialRole } from '../../models/index';
+import Rol, { IRol } from '../../models/Rol';
 import {
   findBotCategory,
   findServer,
@@ -7,55 +8,54 @@ import {
   deleteOldMessagesFromChannel,
   getEmojiByName,
 } from '../../util';
-import initialRoles from './roles.json';
 
 const init = async (client: Client) => {
-  console.log('AutoRol Init');
+  console.log(chalk.yellowBright('Module AutoRol initiated'));
   let rolMessage: Message | undefined;
-  let roles = initialRoles;
-
   // When the bot is ready and starts
   client.on('ready', async () => {
     const server = findServer(client);
-    roles = populateRoleIds(server, roles);
-    rolMessage = await onReady(client, roles);
+    rolMessage = await onReady(server);
   });
 
   // Everytime a member reacts to a message
   client.on('messageReactionAdd', async (reaction, user) => {
     const server = findServer(client);
     if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-      let roleIdToAdd = roles.find((role) => role.icon === reaction.emoji.name)?.id;
+      let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
       let guildUser = server?.members.cache.get(user.id);
-      let roleToAdd = server?.roles.cache.get(roleIdToAdd as string);
+      let roleToAdd = server?.roles.cache.get(dbRol?.id);
       guildUser?.roles.add(roleToAdd as Role);
     }
   });
 
-  // Everytime a member reacts to a message
   client.on('messageReactionRemove', async (reaction, user) => {
     const server = findServer(client);
     if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-      let roleIdToAdd = roles.find((role) => role.icon === reaction.emoji.name)?.id;
+      let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
       let guildUser = server?.members.cache.get(user.id);
-      let roleToAdd = server?.roles.cache.get(roleIdToAdd as string);
+      let roleToAdd = server?.roles.cache.get(dbRol?.id);
       guildUser?.roles.remove(roleToAdd as Role);
     }
   });
 
-  // Everytime a member updates their rich presence
-  client.on('presenceUpdate', () => {});
-
-  // client.on('error', (err) => {});
+  // TODO: Parse a message to add roles to the list if we want to.
+  client.on('message', (message) => {
+    if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
+      if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
+        message.delete();
+      }
+    }
+  });
 };
 
 export default {
   init,
 };
 
-const onReady = async (client: Client, roles: PartialRole[]) => {
-  const server = findServer(client);
+const onReady = async (server: Guild | undefined) => {
   const botCategory = findBotCategory(server);
+  const roles = await Rol.find({});
   let name = 'elegi-tu-rol';
   let description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
   let textChannel = isTextChannelAlreadyCreated(server, name);
@@ -80,29 +80,19 @@ const onReady = async (client: Client, roles: PartialRole[]) => {
   return rolMessage;
 };
 
-const getMessageFromRoles = (acc: string, current: PartialRole): string => {
+const getMessageFromRoles = (acc: string, current: IRol): string => {
   return `${acc}-${current.name}\n`;
 };
 
 const createReactions = (
   message: Message | undefined,
   server: Guild | undefined,
-  roles: PartialRole[],
+  roles: IRol[],
 ) => {
   roles.forEach((role) => {
     let icon = getEmojiByName(server, role.icon);
     if (icon) {
       message?.react(icon?.id);
     }
-  });
-};
-
-const populateRoleIds = (server: Guild | undefined, roles: PartialRole[]) => {
-  return roles.map((role) => {
-    let guildRole = server?.roles.cache.find((e) => e.name === role.displayName);
-    return {
-      ...role,
-      id: guildRole?.id as string,
-    };
   });
 };

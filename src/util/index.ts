@@ -13,9 +13,7 @@ export const findVoiceCategory = (server?: Guild) => {
 };
 
 export const findBotCategory = (server?: Guild) => {
-  return server?.channels.cache.find((channel) => {
-    return channel.id === '733385675986173984';
-  });
+  return server?.channels.cache.get('733385675986173984');
 };
 
 export const isTextChannelAlreadyCreated = (server?: Guild, name?: string) => {
