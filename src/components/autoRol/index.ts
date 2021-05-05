@@ -1,5 +1,5 @@
 import { Client, Message, MessageEmbed, TextChannel, Guild, Role } from 'discord.js';
-import { PartialRole } from '../../classes/index';
+import { PartialRole } from '../../models/index';
 import {
   findBotCategory,
   findServer,

@@ -14,8 +14,11 @@
   "author": "maxhmoyano@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@types/mongoose": "^5.10.5",
+    "chalk": "^4.1.1",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
+    "mongoose": "^5.12.7",
     "nodemon": "^2.0.7"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import { Client, Guild, Activity, GuildChannel, GuildMember, TextChannel } from 'discord.js';
-import { Videogame } from '../classes';
+import { Videogame } from '../models';
+import GamingChannel from '../models/GamingChannel';
 
 export const findServer = (client?: Client): Guild | undefined => {
   return client?.guilds.cache.first();
@@ -61,12 +62,15 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
   return null;
 };
 
-export const isMemberPartOfChannelList = (
+export const isMemberPartOfCreatedChannels = async (
   member: GuildMember,
-  channelList: GuildChannel[],
-): [boolean, GuildChannel | null] => {
+): Promise<[boolean, GuildChannel | null]> => {
   let memberInCreatedChannel: GuildMember | undefined;
   let channelWithMember: GuildChannel | null = null;
+  let channelListDB = await GamingChannel.find({});
+  let channelList = channelListDB.map((channel) => {
+    return member.guild.channels.cache.get(channel.id) as GuildChannel;
+  });
   channelList.forEach((channel) => {
     memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
     channelWithMember = memberInCreatedChannel ? channel : null;
