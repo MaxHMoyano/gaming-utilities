@@ -9,7 +9,7 @@ const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, cre
     if (newVoiceState.channel && newVoiceState.channel.id === createPartyChannel?.id) {
         let videogames = newVoiceState.member?.presence.activities.filter((activity) => activity.type === 'PLAYING');
         let channelName = videogames?.length
-            ? videogames[0].name
+            ? `🔊︱${videogames[0].name}`
             : `🔊︱Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
         let newChannel = await newVoiceState.guild.channels.create(channelName, {
             type: 'voice',

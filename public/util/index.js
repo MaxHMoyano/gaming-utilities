@@ -79,18 +79,9 @@ const isMemberPartOfCreatedChannels = async (member) => {
     return [memberInCreatedChannel ? true : false, channelWithMember];
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
-const getMostPlayedVideogameFromList = (videogames) => {
-    let mostPlayed = {
-        count: 0,
-    };
-    videogames.forEach((videogame) => {
-        if (videogame.count > mostPlayed.count) {
-            mostPlayed = videogame;
-        }
-    });
-    return mostPlayed;
-};
+const getMostPlayedVideogameFromList = (videogames) => videogames.find((e) => e.count === Math.max(...flattenVideogames(videogames)));
 exports.getMostPlayedVideogameFromList = getMostPlayedVideogameFromList;
+const flattenVideogames = (videogames) => videogames.map((videogame) => videogame.count);
 exports.default = {
     findServer: exports.findServer,
     findVoiceCategory: exports.findVoiceCategory,
