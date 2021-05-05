@@ -8,6 +8,6 @@ dotenv.config();
 db.connect().then(() => {
   const client = new Client();
   client.login(process.env.TOKEN);
-  gamingChannel.init(client);
-  // autoRol.init(client);
+  // gamingChannel.init(client);
+  autoRol.init(client);
 });

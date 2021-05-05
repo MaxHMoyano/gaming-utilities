@@ -16,9 +16,7 @@ const findVoiceCategory = (server) => {
 };
 exports.findVoiceCategory = findVoiceCategory;
 const findBotCategory = (server) => {
-    return server?.channels.cache.find((channel) => {
-        return channel.id === '733385675986173984';
-    });
+    return server?.channels.cache.get('733385675986173984');
 };
 exports.findBotCategory = findBotCategory;
 const isTextChannelAlreadyCreated = (server, name) => {
