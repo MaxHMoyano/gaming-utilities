@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./public/index.js",
-    "dev": "tsc -w",
+    "ts": "tsc -w",
     "populateRol": "node populate.js"
   },
   "keywords": [

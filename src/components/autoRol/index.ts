@@ -39,20 +39,14 @@ const init = async (client: Client) => {
     }
   });
 
-  // client.on('message', (message) => {
-  //   if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
-  //     if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
-  //       message.delete();
-  //     }
-  //     let messageParts = message.content.split(' ');
-  //     messageParts.splice(0, 1);
-  //     // !aR counterStrike
-  //     if (messageParts.length > ) {
-  //       let [name, displayName, icon] = messageParts;
-
-  //     }
-  //   }
-  // });
+  // TODO: Parse a message to add roles to the list if we want to.
+  client.on('message', (message) => {
+    if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
+      if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
+        message.delete();
+      }
+    }
+  });
 };
 
 export default {
