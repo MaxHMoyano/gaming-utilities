@@ -1,5 +1,14 @@
 import chalk from 'chalk';
-import { Client, Message, MessageEmbed, TextChannel, Guild, Role } from 'discord.js';
+import {
+  Client,
+  Message,
+  MessageEmbed,
+  TextChannel,
+  Guild,
+  Role,
+  MessageReaction,
+} from 'discord.js';
+import { BotRol } from '../../models';
 import Rol, { IRol } from '../../models/Rol';
 import {
   findBotCategory,
@@ -22,20 +31,22 @@ const init = async (client: Client) => {
   client.on('messageReactionAdd', async (reaction, user) => {
     const server = findServer(client);
     if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-      let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
       let guildUser = server?.members.cache.get(user.id);
-      let roleToAdd = server?.roles.cache.get(dbRol?.id);
-      guildUser?.roles.add(roleToAdd as Role);
+      let roleToAdd = await findRoleByReaction(server, reaction);
+      if (roleToAdd) {
+        guildUser?.roles.add(roleToAdd);
+      }
     }
   });
 
   client.on('messageReactionRemove', async (reaction, user) => {
     const server = findServer(client);
     if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-      let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
       let guildUser = server?.members.cache.get(user.id);
-      let roleToAdd = server?.roles.cache.get(dbRol?.id);
-      guildUser?.roles.remove(roleToAdd as Role);
+      let roleToAdd = await findRoleByReaction(server, reaction);
+      if (roleToAdd) {
+        guildUser?.roles.remove(roleToAdd);
+      }
     }
   });
 
@@ -53,41 +64,63 @@ export default {
   init,
 };
 
-const onReady = async (server: Guild | undefined) => {
-  const botCategory = findBotCategory(server);
-  const roles = await Rol.find({});
-  let name = 'elegi-tu-rol';
-  let description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
-  let textChannel = isTextChannelAlreadyCreated(server, name);
-  let autoRolChannel: TextChannel | undefined;
-  if (textChannel) {
-    autoRolChannel = textChannel;
-  } else {
-    autoRolChannel = await server?.channels.create(name, {
-      parent: botCategory,
-      position: 0,
-      type: 'text',
-      topic: description,
-    });
+const findRoleByReaction = async (server: Guild | undefined, reaction: MessageReaction) => {
+  let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
+  if (dbRol) {
+    let roleToAdd = server?.roles.cache.get(dbRol?.id);
+    return roleToAdd as Role;
   }
-  let message = new MessageEmbed()
-    .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
-    .setColor('DARK_GOLD')
-    .setDescription(`${roles.reduce(getMessageFromRoles, '')}`);
-  deleteOldMessagesFromChannel(autoRolChannel);
-  const rolMessage = await autoRolChannel?.send(message);
-  createReactions(rolMessage, server, roles);
-  return rolMessage;
+  return null;
 };
 
-const getMessageFromRoles = (acc: string, current: IRol): string => {
-  return `${acc}-${current.name}\n`;
+const onReady = async (server: Guild | undefined) => {
+  const description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
+  const roles = await getRolesFromDb(server);
+  const autoRolChannel = await getAutoRolChannel(server, description);
+
+  if (roles.length) {
+    let message = new MessageEmbed()
+      .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
+      .setColor('DARK_GOLD')
+      .setDescription(`${roles.reduce(getMessageFromRoles, '')}`);
+    await deleteOldMessagesFromChannel(autoRolChannel);
+    const rolMessage = await autoRolChannel?.send(message);
+    await createReactions(rolMessage, server, roles);
+    return rolMessage;
+  }
 };
 
-const createReactions = (
+const getRolesFromDb = async (server: Guild | undefined) => {
+  let rolesDb = await Rol.find({});
+  return rolesDb.map((rol) => {
+    let discordRol = server?.roles.cache.get(rol.id);
+    return { ...discordRol, icon: rol.icon } as BotRol;
+  });
+};
+
+const getAutoRolChannel = async (server: Guild | undefined, description: string) => {
+  const botCategory = findBotCategory(server);
+  let name = '🤖︱elegi-tu-rol';
+  let textChannel = isTextChannelAlreadyCreated(server, name);
+  if (textChannel) {
+    return textChannel;
+  }
+  return await server?.channels.create(name, {
+    parent: botCategory,
+    position: 0,
+    type: 'text',
+    topic: description,
+  });
+};
+
+const getMessageFromRoles = (acc: string, current: BotRol): string => {
+  return `${acc}- ${current.name}\n`;
+};
+
+const createReactions = async (
   message: Message | undefined,
   server: Guild | undefined,
-  roles: IRol[],
+  roles: BotRol[],
 ) => {
   roles.forEach((role) => {
     let icon = getEmojiByName(server, role.icon);
@@ -95,4 +128,5 @@ const createReactions = (
       message?.react(icon?.id);
     }
   });
+  return;
 };

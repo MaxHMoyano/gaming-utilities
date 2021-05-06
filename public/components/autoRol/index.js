@@ -19,19 +19,21 @@ const init = async (client) => {
     client.on('messageReactionAdd', async (reaction, user) => {
         const server = util_1.findServer(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-            let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
             let guildUser = server?.members.cache.get(user.id);
-            let roleToAdd = server?.roles.cache.get(dbRol?.id);
-            guildUser?.roles.add(roleToAdd);
+            let roleToAdd = await findRoleByReaction(server, reaction);
+            if (roleToAdd) {
+                guildUser?.roles.add(roleToAdd);
+            }
         }
     });
     client.on('messageReactionRemove', async (reaction, user) => {
         const server = util_1.findServer(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
-            let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
             let guildUser = server?.members.cache.get(user.id);
-            let roleToAdd = server?.roles.cache.get(dbRol?.id);
-            guildUser?.roles.remove(roleToAdd);
+            let roleToAdd = await findRoleByReaction(server, reaction);
+            if (roleToAdd) {
+                guildUser?.roles.remove(roleToAdd);
+            }
         }
     });
     // TODO: Parse a message to add roles to the list if we want to.
@@ -46,41 +48,59 @@ const init = async (client) => {
 exports.default = {
     init,
 };
+const findRoleByReaction = async (server, reaction) => {
+    let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
+    if (dbRol) {
+        let roleToAdd = server?.roles.cache.get(dbRol?.id);
+        return roleToAdd;
+    }
+    return null;
+};
 const onReady = async (server) => {
+    const description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
+    const roles = await getRolesFromDb(server);
+    const autoRolChannel = await getAutoRolChannel(server, description);
+    if (roles.length) {
+        let message = new discord_js_1.MessageEmbed()
+            .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
+            .setColor('DARK_GOLD')
+            .setDescription(`${roles.reduce(getMessageFromRoles, '')}`);
+        await util_1.deleteOldMessagesFromChannel(autoRolChannel);
+        const rolMessage = await autoRolChannel?.send(message);
+        await createReactions(rolMessage, server, roles);
+        return rolMessage;
+    }
+};
+const getRolesFromDb = async (server) => {
+    let rolesDb = await Rol_1.default.find({});
+    return rolesDb.map((rol) => {
+        let discordRol = server?.roles.cache.get(rol.id);
+        return { ...discordRol, icon: rol.icon };
+    });
+};
+const getAutoRolChannel = async (server, description) => {
     const botCategory = util_1.findBotCategory(server);
-    const roles = await Rol_1.default.find({});
-    let name = 'elegi-tu-rol';
-    let description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
+    let name = '🤖︱elegi-tu-rol';
     let textChannel = util_1.isTextChannelAlreadyCreated(server, name);
-    let autoRolChannel;
     if (textChannel) {
-        autoRolChannel = textChannel;
+        return textChannel;
     }
-    else {
-        autoRolChannel = await server?.channels.create(name, {
-            parent: botCategory,
-            position: 0,
-            type: 'text',
-            topic: description,
-        });
-    }
-    let message = new discord_js_1.MessageEmbed()
-        .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
-        .setColor('DARK_GOLD')
-        .setDescription(`${roles.reduce(getMessageFromRoles, '')}`);
-    util_1.deleteOldMessagesFromChannel(autoRolChannel);
-    const rolMessage = await autoRolChannel?.send(message);
-    createReactions(rolMessage, server, roles);
-    return rolMessage;
+    return await server?.channels.create(name, {
+        parent: botCategory,
+        position: 0,
+        type: 'text',
+        topic: description,
+    });
 };
 const getMessageFromRoles = (acc, current) => {
-    return `${acc}-${current.name}\n`;
+    return `${acc}- ${current.name}\n`;
 };
-const createReactions = (message, server, roles) => {
+const createReactions = async (message, server, roles) => {
     roles.forEach((role) => {
         let icon = util_1.getEmojiByName(server, role.icon);
         if (icon) {
             message?.react(icon?.id);
         }
     });
+    return;
 };
