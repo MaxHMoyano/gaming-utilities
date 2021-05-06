@@ -44,7 +44,7 @@ const init = async (client: Client) => {
       if (roleToAdd) {
         console.log(
           chalk.redBright(
-            `Role ${roleToAdd.name} given to ${guildUser?.nickname || guildUser?.displayName}`,
+            `Role ${roleToAdd.name} taken from ${guildUser?.nickname || guildUser?.displayName}`,
           ),
         );
         guildUser?.roles.remove(roleToAdd);

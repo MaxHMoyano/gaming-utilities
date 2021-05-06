@@ -33,7 +33,7 @@ const init = async (client) => {
             let guildUser = server?.members.cache.get(user.id);
             let roleToAdd = await findRoleByReaction(server, reaction);
             if (roleToAdd) {
-                console.log(chalk_1.default.redBright(`Role ${roleToAdd.name} given to ${guildUser?.nickname || guildUser?.displayName}`));
+                console.log(chalk_1.default.redBright(`Role ${roleToAdd.name} taken from ${guildUser?.nickname || guildUser?.displayName}`));
                 guildUser?.roles.remove(roleToAdd);
             }
         }
