@@ -34,6 +34,11 @@ const init = async (client: Client) => {
       let guildUser = server?.members.cache.get(user.id);
       let roleToAdd = await findRoleByReaction(server, reaction);
       if (roleToAdd) {
+        console.log(
+          chalk.greenBright(
+            `Role ${roleToAdd.name} given to ${guildUser?.nickname || guildUser?.displayName}`,
+          ),
+        );
         guildUser?.roles.add(roleToAdd);
       }
     }
@@ -45,6 +50,11 @@ const init = async (client: Client) => {
       let guildUser = server?.members.cache.get(user.id);
       let roleToAdd = await findRoleByReaction(server, reaction);
       if (roleToAdd) {
+        console.log(
+          chalk.redBright(
+            `Role ${roleToAdd.name} given to ${guildUser?.nickname || guildUser?.displayName}`,
+          ),
+        );
         guildUser?.roles.remove(roleToAdd);
       }
     }
@@ -66,6 +76,7 @@ export default {
 
 const findRoleByReaction = async (server: Guild | undefined, reaction: MessageReaction) => {
   let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
+  debugger;
   if (dbRol) {
     let roleToAdd = server?.roles.cache.get(dbRol?.id);
     return roleToAdd as Role;
