@@ -14,7 +14,7 @@ const connectDB = async () => {
 
   const RolSchema = new Schema({
     _id: { type: String, required: [true, 'El id es obligatorio'] },
-    name: { type: String, required: [true, 'El nombre del rol creado es obligatorio'] },
+    displayName: { type: String, required: [true, 'El nombre del rol creado es obligatorio'] },
     icon: { type: String, required: [true, 'El icono del rol es obligatorio'] },
   });
 
@@ -23,82 +23,82 @@ const connectDB = async () => {
   await Rol.create([
     {
       _id: '701194597996429403',
-      name: 'Counter Strike: Global Offensive',
+      displayName: 'Counter Strike: Global Offensive',
       icon: 'csgo',
     },
     {
       _id: '838112805646237717',
-      name: 'Factorio',
+      displayName: 'Factorio',
       icon: 'factorio',
     },
     {
       _id: '724940911783444561',
-      name: 'League of Legends',
+      displayName: 'League of Legends',
       icon: 'lol',
     },
     {
       _id: '808143127399497728',
-      name: 'Hunt: Showdown',
+      displayName: 'Hunt: Showdown',
       icon: 'hunt',
     },
     {
       _id: '826293539742416928',
-      name: 'Hearts of Iron IV',
+      displayName: 'Hearts of Iron IV',
       icon: 'hoi',
     },
     {
       _id: '759234328525275187',
-      name: 'Dragon Ball: FighterZ',
+      displayName: 'Dragon Ball: FighterZ',
       icon: 'fighterZ',
     },
     {
       _id: '815304218998341643',
-      name: 'Tabletop Simulator',
+      displayName: 'Tabletop Simulator',
       icon: 'tabletop',
     },
     {
       _id: '723336271841460304',
-      name: 'Euro Truck Simulator',
+      displayName: 'Euro Truck Simulator',
       icon: 'euroTruck',
     },
     {
       _id: '719686957889748993',
-      name: "Sid Meier's Civilization",
+      displayName: "Sid Meier's Civilization",
       icon: 'civilization',
     },
     {
       _id: '575141298386894889',
-      name: 'Star Wars: Battlefront 2',
+      displayName: 'Star Wars: Battlefront 2',
       icon: 'starwars',
     },
     {
       _id: '719687372887031851',
-      name: 'Fallout',
+      displayName: 'Fallout',
       icon: 'fallout',
     },
     {
       _id: '753383614963646614',
-      name: 'Risk of Rain 2',
+      displayName: 'Risk of Rain 2',
       icon: 'riskOfRain',
     },
     {
       _id: '724941063302807554',
-      name: 'Smite',
+      displayName: 'Smite',
       icon: 'smite',
     },
     {
       _id: '763630163191660545',
-      name: 'Rocket League',
+      displayName: 'Rocket League',
       icon: 'rocketLeague',
     },
     {
       _id: '762459028801847297',
-      name: 'Genshin Impact',
+      displayName: 'Genshin Impact',
       icon: 'genshin',
     },
     {
       _id: '719730036520779818',
-      name: 'Jackbox',
+      displayName: 'Jackbox',
       icon: 'jackbox',
     },
   ]);

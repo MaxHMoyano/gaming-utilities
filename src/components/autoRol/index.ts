@@ -1,15 +1,7 @@
 import chalk from 'chalk';
-import {
-  Client,
-  Message,
-  MessageEmbed,
-  TextChannel,
-  Guild,
-  Role,
-  MessageReaction,
-} from 'discord.js';
+import { Client, Message, MessageEmbed, Guild, Role, MessageReaction } from 'discord.js';
 import { BotRol } from '../../models';
-import Rol, { IRol } from '../../models/Rol';
+import Rol from '../../models/Rol';
 import {
   findBotCategory,
   findServer,
@@ -59,15 +51,6 @@ const init = async (client: Client) => {
       }
     }
   });
-
-  // TODO: Parse a message to add roles to the list if we want to.
-  client.on('message', (message) => {
-    if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
-      if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
-        message.delete();
-      }
-    }
-  });
 };
 
 export default {
@@ -76,7 +59,7 @@ export default {
 
 const findRoleByReaction = async (server: Guild | undefined, reaction: MessageReaction) => {
   let dbRol = await Rol.findOne({ icon: reaction.emoji.name });
-  debugger;
+
   if (dbRol) {
     let roleToAdd = server?.roles.cache.get(dbRol?.id);
     return roleToAdd as Role;
@@ -88,7 +71,6 @@ const onReady = async (server: Guild | undefined) => {
   const description = 'Queres ser notificado cuando el server juega a algo? Decinos que jugas!';
   const roles = await getRolesFromDb(server);
   const autoRolChannel = await getAutoRolChannel(server, description);
-
   if (roles.length) {
     let message = new MessageEmbed()
       .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
@@ -105,7 +87,7 @@ const getRolesFromDb = async (server: Guild | undefined) => {
   let rolesDb = await Rol.find({});
   return rolesDb.map((rol) => {
     let discordRol = server?.roles.cache.get(rol.id);
-    return { ...discordRol, icon: rol.icon } as BotRol;
+    return { ...discordRol, icon: rol.icon, displayName: rol.displayName } as BotRol;
   });
 };
 
@@ -125,7 +107,7 @@ const getAutoRolChannel = async (server: Guild | undefined, description: string)
 };
 
 const getMessageFromRoles = (acc: string, current: BotRol): string => {
-  return `${acc}- ${current.name}\n`;
+  return `${acc}- ${current.displayName}\n`;
 };
 
 const createReactions = async (

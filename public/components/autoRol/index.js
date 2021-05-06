@@ -38,21 +38,12 @@ const init = async (client) => {
             }
         }
     });
-    // TODO: Parse a message to add roles to the list if we want to.
-    client.on('message', (message) => {
-        if (message && message.channel.id === rolMessage?.channel.id && message.id !== rolMessage.id) {
-            if (!message.content.startsWith('!addRole') || !message.content.startsWith('!aR')) {
-                message.delete();
-            }
-        }
-    });
 };
 exports.default = {
     init,
 };
 const findRoleByReaction = async (server, reaction) => {
     let dbRol = await Rol_1.default.findOne({ icon: reaction.emoji.name });
-    debugger;
     if (dbRol) {
         let roleToAdd = server?.roles.cache.get(dbRol?.id);
         return roleToAdd;
@@ -78,7 +69,7 @@ const getRolesFromDb = async (server) => {
     let rolesDb = await Rol_1.default.find({});
     return rolesDb.map((rol) => {
         let discordRol = server?.roles.cache.get(rol.id);
-        return { ...discordRol, icon: rol.icon };
+        return { ...discordRol, icon: rol.icon, displayName: rol.displayName };
     });
 };
 const getAutoRolChannel = async (server, description) => {
@@ -96,7 +87,7 @@ const getAutoRolChannel = async (server, description) => {
     });
 };
 const getMessageFromRoles = (acc, current) => {
-    return `${acc}- ${current.name}\n`;
+    return `${acc}- ${current.displayName}\n`;
 };
 const createReactions = async (message, server, roles) => {
     roles.forEach((role) => {

@@ -8,4 +8,5 @@ export interface Videogame {
 
 export interface BotRol extends Role {
   icon: string;
+  displayName: string;
 }
