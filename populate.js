@@ -52,6 +52,72 @@ const connectDB = async () => {
       icon: 'hoi',
       displayName: 'Hearts of Hoi',
     },
+    {
+      _id: '759234328525275187',
+      name: 'Dragon Ball: FighterZ',
+      icon: 'fighterZ',
+      displayName: 'Fighterz',
+    },
+    {
+      _id: '815304218998341643',
+      name: 'Tabletop Simulator',
+      icon: 'tabletop',
+      displayName: 'Board Game Enthusiasts',
+    },
+    {
+      _id: '723336271841460304',
+      name: 'Euro Truck Simulator',
+      icon: 'euroTruck',
+      displayName: 'EuroTruckers',
+    },
+    {
+      _id: '719686957889748993',
+      name: "Sid Meier's Civilization",
+      icon: 'civilization',
+      displayName: 'Civilized Fellas',
+    },
+    {
+      _id: '575141298386894889',
+      name: 'Star Wars: Battlefront 2',
+      icon: 'starwars',
+      displayName: 'Star Wars Stormtroopers',
+    },
+    {
+      _id: '719687372887031851',
+      name: 'Fallout',
+      icon: 'fallout',
+      displayName: 'New Vegas Rangers',
+    },
+    {
+      _id: '753383614963646614',
+      name: 'Risk of Rain 2',
+      icon: 'riskOfRain',
+      displayName: 'Pibes lluviosos',
+    },
+    {
+      _id: '724941063302807554',
+      name: 'Smite',
+      icon: 'smite',
+      displayName: 'Smite Gods',
+    },
+    {
+      _id: '763630163191660545',
+      name: 'Rocket League',
+      icon: 'rocketLeague',
+      displayName: 'Rocketto-samas',
+    },
+    {
+      _id: '762459028801847297',
+      name: 'Genshin Impact',
+      icon: 'genshin',
+      displayName: 'Genshin Impact',
+    },
+    {
+      _id: '719730036520779818',
+      name: 'Jackbox',
+      icon: 'jackbox',
+      displayName: 'Jack Boxers',
+    },
   ]);
   console.log('Database populated');
   return;
