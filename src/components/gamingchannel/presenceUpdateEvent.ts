@@ -4,7 +4,7 @@ import { Videogame } from '../../models';
 import {
   getChannelPlayedVideogames,
   isMemberPartOfCreatedChannels,
-  getMostPlayedVideogameFromList,
+  getMostPlayedVideogamesFromList,
   getRandomNameFromThemeNames,
   changeChannelName,
 } from '../../util';
@@ -15,11 +15,9 @@ const checkAllChannelsNames = async (channels: GuildChannel[]) => {
     videogames = getChannelPlayedVideogames(channels[idx]);
     // If a videogame is being played on the server, we will show it
     if (videogames && videogames.length) {
-      let mostPlayedVideogames: Videogame[] = getMostPlayedVideogameFromList(videogames);
+      let mostPlayedVideogames: Videogame[] = getMostPlayedVideogamesFromList(videogames);
       if (mostPlayedVideogames.length === 1) {
         changeChannelName(channels[idx], `🔊︱${mostPlayedVideogames[0].name}`);
-      } else {
-        changeChannelName(channels[idx], `🔊︱${getRandomNameFromThemeNames()}`);
       }
     }
   }

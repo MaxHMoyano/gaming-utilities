@@ -101,11 +101,8 @@ export const isMemberPartOfCreatedChannels = async (
   return memberInCreatedChannel ? channelList : [];
 };
 
-export const getMostPlayedVideogameFromList = (videogames: Videogame[]) =>
-  videogames.filter((e) => e.count === Math.max(...flattenVideogames(videogames)));
-
-const flattenVideogames = (videogames: Videogame[]) =>
-  videogames.map((videogame) => videogame.count);
+export const getMostPlayedVideogamesFromList = (videogames: Videogame[]) =>
+  videogames.filter((e) => e.count >= 2);
 
 export default {
   getRandomNameFromThemeNames,
@@ -117,5 +114,5 @@ export default {
   isTextChannelAlreadyCreated,
   deleteOldMessagesFromChannel,
   getChannelPlayedVideogames,
-  getMostPlayedVideogameFromList,
+  getMostPlayedVideogamesFromList,
 };
