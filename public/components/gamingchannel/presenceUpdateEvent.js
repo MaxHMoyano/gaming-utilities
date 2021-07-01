@@ -13,6 +13,7 @@ const checkAllChannelsNames = async (channels) => {
         if (videogames && videogames.length) {
             let mostPlayedVideogames = util_1.getMostPlayedVideogamesFromList(videogames);
             if (mostPlayedVideogames.length === 1) {
+                console.log(chalk_1.default.cyanBright(`The channel ${channels[idx].name} has changed its primary videogame`));
                 util_1.changeChannelName(channels[idx], `🔊︱${mostPlayedVideogames[0].name}`);
             }
         }
@@ -23,7 +24,7 @@ const presenceUpdateEvent = async (oldPresence) => {
     if (member) {
         let channels = await util_1.isMemberPartOfCreatedChannels(member);
         if (channels && channels.length) {
-            console.log(chalk_1.default.whiteBright(`A new member from a created channel has changed their presence... Checking all created lobbies`));
+            console.log(chalk_1.default.cyanBright(`A new member from a created channel has changed their presence... Checking all created lobbies`));
             checkAllChannelsNames(channels);
         }
     }
