@@ -5,12 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const GamingChannel_1 = __importDefault(require("../../models/GamingChannel"));
+const util_1 = require("../../util");
 const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, createPartyChannel) => {
     if (newVoiceState.channel && newVoiceState.channel.id === createPartyChannel?.id) {
         let videogames = newVoiceState.member?.presence.activities.filter((activity) => activity.type === 'PLAYING');
         let channelName = videogames?.length
             ? `🔊︱${videogames[0].name}`
-            : `🔊︱Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
+            : `🔊︱${util_1.getRandomNameFromThemeNames()}`;
         let newChannel = await newVoiceState.guild.channels.create(channelName, {
             type: 'voice',
             parent: voiceCategory,
