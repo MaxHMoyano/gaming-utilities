@@ -21,6 +21,12 @@ export const getRandomNameFromThemeNames = () => {
   return _.sample(themeNames);
 };
 
+export const changeChannelName = async (channel: GuildChannel, name: string) => {
+  if (channel.name !== name) {
+    await channel.edit({ name });
+  }
+};
+
 export const findServer = (client?: Client): Guild | undefined => {
   return client?.guilds.cache.first();
 };
@@ -104,6 +110,7 @@ const flattenVideogames = (videogames: Videogame[]) =>
 export default {
   getRandomNameFromThemeNames,
   findServer,
+  changeChannelName,
   findVoiceCategory,
   findBotCategory,
   getEmojiByName,
