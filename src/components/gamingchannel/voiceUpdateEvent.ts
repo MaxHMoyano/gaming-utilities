@@ -1,6 +1,7 @@
 import { VoiceState, GuildChannel } from 'discord.js';
 import chalk from 'chalk';
 import GamingChannel from '../../models/GamingChannel';
+import { getRandomNameFromThemeNames } from '../../util';
 
 const voiceUpdateEvent = async (
   oldVoiceState: VoiceState,
@@ -14,7 +15,7 @@ const voiceUpdateEvent = async (
     );
     let channelName = videogames?.length
       ? `🔊︱${videogames[0].name}`
-      : `🔊︱Party de ${newVoiceState.member?.nickname || newVoiceState.member?.displayName}`;
+      : `🔊︱${getRandomNameFromThemeNames()}`;
     let newChannel = await newVoiceState.guild.channels.create(channelName, {
       type: 'voice',
       parent: voiceCategory,

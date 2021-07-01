@@ -5,7 +5,6 @@ import {
   getChannelPlayedVideogames,
   isMemberPartOfCreatedChannels,
   getMostPlayedVideogamesFromList,
-  getRandomNameFromThemeNames,
   changeChannelName,
 } from '../../util';
 
