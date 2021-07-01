@@ -95,7 +95,7 @@ const isMemberPartOfCreatedChannels = async (member) => {
         memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
         // channelWithMember = memberInCreatedChannel ? channel : null;
     });
-    return [memberInCreatedChannel ? true : false, channelList];
+    return memberInCreatedChannel ? channelList : [];
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
 const getMostPlayedVideogameFromList = (videogames) => videogames.find((e) => e.count === Math.max(...flattenVideogames(videogames)));

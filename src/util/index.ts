@@ -81,7 +81,7 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
 
 export const isMemberPartOfCreatedChannels = async (
   member: GuildMember,
-): Promise<[boolean, GuildChannel[] | null]> => {
+): Promise<GuildChannel[]> => {
   let memberInCreatedChannel: GuildMember | undefined;
   // let channelWithMember: GuildChannel | null = null;
   let channelListDB = await GamingChannel.find({});
@@ -92,7 +92,7 @@ export const isMemberPartOfCreatedChannels = async (
     memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
     // channelWithMember = memberInCreatedChannel ? channel : null;
   });
-  return [memberInCreatedChannel ? true : false, channelList];
+  return memberInCreatedChannel ? channelList : [];
 };
 
 export const getMostPlayedVideogameFromList = (videogames: Videogame[]) =>

@@ -9,25 +9,23 @@ const presenceUpdateEvent = async (oldPresence) => {
     let member = oldPresence?.member;
     let videogames = [];
     if (member) {
-        let [isMemberPartOfList, channels] = await util_1.isMemberPartOfCreatedChannels(member);
-        if (isMemberPartOfList && channels) {
-            console.log(chalk_1.default.whiteBright(`A new member from a channel has changed their presence`));
-            for (let index = 0; index < channels.length; index++) {
-                videogames = util_1.getChannelPlayedVideogames(channels[index]);
+        let channels = await util_1.isMemberPartOfCreatedChannels(member);
+        if (channels && channels.length) {
+            console.log(chalk_1.default.whiteBright(`A new member from a created channel has changed their presence... Checking all created lobbies`));
+            for (let idx = 0; idx < channels.length; idx++) {
+                videogames = util_1.getChannelPlayedVideogames(channels[idx]);
                 // If a videogame is being played on the server, we will show it
                 if (videogames && videogames.length) {
                     let mostPlayedVideogame = util_1.getMostPlayedVideogameFromList(videogames);
-                    let editedChannel = await channels[index]?.edit({
+                    await channels[idx]?.edit({
                         name: `🔊︱${mostPlayedVideogame?.name}`,
                     });
-                    console.log(chalk_1.default.cyanBright(`Changed name to ${editedChannel.name}`));
                 }
                 else {
                     // If not, we will choose a random name for it
-                    let editedChannel = await channels[index]?.edit({
+                    await channels[idx]?.edit({
                         name: `🔊︱${util_1.getRandomNameFromThemeNames()}`,
                     });
-                    console.log(chalk_1.default.cyanBright(`Changed name to ${editedChannel.name}`));
                 }
             }
         }
