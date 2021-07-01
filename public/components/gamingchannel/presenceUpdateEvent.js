@@ -11,12 +11,13 @@ const checkAllChannelsNames = async (channels) => {
         videogames = util_1.getChannelPlayedVideogames(channels[idx]);
         // If a videogame is being played on the server, we will show it
         if (videogames && videogames.length) {
-            let mostPlayedVideogame = util_1.getMostPlayedVideogameFromList(videogames);
-            await util_1.changeChannelName(channels[idx], `🔊︱${mostPlayedVideogame?.name}`);
-        }
-        else {
-            // If not, we will choose a random name for it
-            await util_1.changeChannelName(channels[idx], `🔊︱${util_1.getRandomNameFromThemeNames()}`);
+            let mostPlayedVideogames = util_1.getMostPlayedVideogameFromList(videogames);
+            if (mostPlayedVideogames.length === 1) {
+                util_1.changeChannelName(channels[idx], `🔊︱${mostPlayedVideogames[0].name}`);
+            }
+            else {
+                util_1.changeChannelName(channels[idx], `🔊︱${util_1.getRandomNameFromThemeNames()}`);
+            }
         }
     }
 };

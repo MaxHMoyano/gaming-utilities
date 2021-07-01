@@ -21,9 +21,9 @@ export const getRandomNameFromThemeNames = () => {
   return _.sample(themeNames);
 };
 
-export const changeChannelName = async (channel: GuildChannel, name: string) => {
+export const changeChannelName = (channel: GuildChannel, name: string) => {
   if (channel.name !== name) {
-    await channel.edit({ name });
+    channel.edit({ name });
   }
 };
 
@@ -102,7 +102,7 @@ export const isMemberPartOfCreatedChannels = async (
 };
 
 export const getMostPlayedVideogameFromList = (videogames: Videogame[]) =>
-  videogames.find((e) => e.count === Math.max(...flattenVideogames(videogames)));
+  videogames.filter((e) => e.count === Math.max(...flattenVideogames(videogames)));
 
 const flattenVideogames = (videogames: Videogame[]) =>
   videogames.map((videogame) => videogame.count);

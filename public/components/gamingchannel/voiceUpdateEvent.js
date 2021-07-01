@@ -27,9 +27,9 @@ const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, cre
         let dbChannel = await GamingChannel_1.default.findById(oldVoiceState.channel.id);
         let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.id);
         if (channel && channel.members.array().length === 0) {
-            console.log(chalk_1.default.redBright(`Deleting ${channel.name}...`));
             await GamingChannel_1.default.findByIdAndDelete(channel.id);
             await channel.delete();
+            console.log(chalk_1.default.redBright(`${channel.name} Deleted`));
         }
     }
 };

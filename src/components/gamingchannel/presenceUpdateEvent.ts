@@ -15,11 +15,12 @@ const checkAllChannelsNames = async (channels: GuildChannel[]) => {
     videogames = getChannelPlayedVideogames(channels[idx]);
     // If a videogame is being played on the server, we will show it
     if (videogames && videogames.length) {
-      let mostPlayedVideogame: Videogame | undefined = getMostPlayedVideogameFromList(videogames);
-      await changeChannelName(channels[idx], `🔊︱${mostPlayedVideogame?.name}`);
-    } else {
-      // If not, we will choose a random name for it
-      await changeChannelName(channels[idx], `🔊︱${getRandomNameFromThemeNames()}`);
+      let mostPlayedVideogames: Videogame[] = getMostPlayedVideogameFromList(videogames);
+      if (mostPlayedVideogames.length === 1) {
+        changeChannelName(channels[idx], `🔊︱${mostPlayedVideogames[0].name}`);
+      } else {
+        changeChannelName(channels[idx], `🔊︱${getRandomNameFromThemeNames()}`);
+      }
     }
   }
 };

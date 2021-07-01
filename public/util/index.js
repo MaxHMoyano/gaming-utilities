@@ -24,9 +24,9 @@ const getRandomNameFromThemeNames = () => {
     return lodash_1.default.sample(themeNames);
 };
 exports.getRandomNameFromThemeNames = getRandomNameFromThemeNames;
-const changeChannelName = async (channel, name) => {
+const changeChannelName = (channel, name) => {
     if (channel.name !== name) {
-        await channel.edit({ name });
+        channel.edit({ name });
     }
 };
 exports.changeChannelName = changeChannelName;
@@ -104,7 +104,7 @@ const isMemberPartOfCreatedChannels = async (member) => {
     return memberInCreatedChannel ? channelList : [];
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
-const getMostPlayedVideogameFromList = (videogames) => videogames.find((e) => e.count === Math.max(...flattenVideogames(videogames)));
+const getMostPlayedVideogameFromList = (videogames) => videogames.filter((e) => e.count === Math.max(...flattenVideogames(videogames)));
 exports.getMostPlayedVideogameFromList = getMostPlayedVideogameFromList;
 const flattenVideogames = (videogames) => videogames.map((videogame) => videogame.count);
 exports.default = {
