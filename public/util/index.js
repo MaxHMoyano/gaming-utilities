@@ -3,8 +3,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMostPlayedVideogameFromList = exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = void 0;
+exports.getMostPlayedVideogameFromList = exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = exports.getRandomNameFromThemeNames = void 0;
 const GamingChannel_1 = __importDefault(require("../models/GamingChannel"));
+const lodash_1 = __importDefault(require("lodash"));
+const themeNames = [
+    'Cocina',
+    'Comedor',
+    'Living',
+    'Dormitorio Grande',
+    'Dormitorio chiquito',
+    'Sala de estar',
+    'Sex dungeon',
+    'Patio',
+    'Quincho',
+    'Terraza',
+    'Pasillo',
+    'Sotano',
+];
+const getRandomNameFromThemeNames = () => {
+    return lodash_1.default.sample(themeNames);
+};
+exports.getRandomNameFromThemeNames = getRandomNameFromThemeNames;
 const findServer = (client) => {
     return client?.guilds.cache.first();
 };
@@ -67,22 +86,23 @@ const getChannelPlayedVideogames = (channel) => {
 exports.getChannelPlayedVideogames = getChannelPlayedVideogames;
 const isMemberPartOfCreatedChannels = async (member) => {
     let memberInCreatedChannel;
-    let channelWithMember = null;
+    // let channelWithMember: GuildChannel | null = null;
     let channelListDB = await GamingChannel_1.default.find({});
     let channelList = channelListDB.map((channel) => {
         return member.guild.channels.cache.get(channel.id);
     });
     channelList.forEach((channel) => {
         memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
-        channelWithMember = memberInCreatedChannel ? channel : null;
+        // channelWithMember = memberInCreatedChannel ? channel : null;
     });
-    return [memberInCreatedChannel ? true : false, channelWithMember];
+    return [memberInCreatedChannel ? true : false, channelList];
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
 const getMostPlayedVideogameFromList = (videogames) => videogames.find((e) => e.count === Math.max(...flattenVideogames(videogames)));
 exports.getMostPlayedVideogameFromList = getMostPlayedVideogameFromList;
 const flattenVideogames = (videogames) => videogames.map((videogame) => videogame.count);
 exports.default = {
+    getRandomNameFromThemeNames: exports.getRandomNameFromThemeNames,
     findServer: exports.findServer,
     findVoiceCategory: exports.findVoiceCategory,
     findBotCategory: exports.findBotCategory,

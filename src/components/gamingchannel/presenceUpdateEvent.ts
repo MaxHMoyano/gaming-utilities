@@ -5,24 +5,34 @@ import {
   getChannelPlayedVideogames,
   isMemberPartOfCreatedChannels,
   getMostPlayedVideogameFromList,
+  getRandomNameFromThemeNames,
 } from '../../util';
 
 const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   let member = oldPresence?.member;
   let videogames: Videogame[] | null = [];
   if (member) {
-    let [isMemberPartOfList, channel] = await isMemberPartOfCreatedChannels(member);
-    if (isMemberPartOfList && channel) {
-      console.log(
-        chalk.whiteBright(`A new member from ${channel.name} has changed their presence`),
-      );
-      videogames = getChannelPlayedVideogames(channel);
-    }
-    if (videogames && videogames.length) {
-      let mostPlayedVideogame: Videogame | undefined = getMostPlayedVideogameFromList(videogames);
-      channel?.edit({ name: `🔊︱${mostPlayedVideogame?.name}` }).then((editedChannel) => {
-        console.log(chalk.cyanBright(`Changed name to ${editedChannel.name}`));
-      });
+    let [isMemberPartOfList, channels] = await isMemberPartOfCreatedChannels(member);
+    if (isMemberPartOfList && channels) {
+      console.log(chalk.whiteBright(`A new member from a channel has changed their presence`));
+      for (let index = 0; index < channels.length; index++) {
+        videogames = getChannelPlayedVideogames(channels[index]);
+        // If a videogame is being played on the server, we will show it
+        if (videogames && videogames.length) {
+          let mostPlayedVideogame: Videogame | undefined =
+            getMostPlayedVideogameFromList(videogames);
+          let editedChannel = await channels[index]?.edit({
+            name: `🔊︱${mostPlayedVideogame?.name}`,
+          });
+          console.log(chalk.cyanBright(`Changed name to ${editedChannel.name}`));
+        } else {
+          // If not, we will choose a random name for it
+          let editedChannel = await channels[index]?.edit({
+            name: `🔊︱${getRandomNameFromThemeNames()}`,
+          });
+          console.log(chalk.cyanBright(`Changed name to ${editedChannel.name}`));
+        }
+      }
     }
   }
 };

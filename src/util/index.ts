@@ -1,6 +1,25 @@
 import { Client, Guild, Activity, GuildChannel, GuildMember, TextChannel } from 'discord.js';
 import { Videogame } from '../models';
 import GamingChannel from '../models/GamingChannel';
+import _ from 'lodash';
+const themeNames: string[] = [
+  'Cocina',
+  'Comedor',
+  'Living',
+  'Dormitorio Grande',
+  'Dormitorio chiquito',
+  'Sala de estar',
+  'Sex dungeon',
+  'Patio',
+  'Quincho',
+  'Terraza',
+  'Pasillo',
+  'Sotano',
+];
+
+export const getRandomNameFromThemeNames = () => {
+  return _.sample(themeNames);
+};
 
 export const findServer = (client?: Client): Guild | undefined => {
   return client?.guilds.cache.first();
@@ -62,18 +81,18 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
 
 export const isMemberPartOfCreatedChannels = async (
   member: GuildMember,
-): Promise<[boolean, GuildChannel | null]> => {
+): Promise<[boolean, GuildChannel[] | null]> => {
   let memberInCreatedChannel: GuildMember | undefined;
-  let channelWithMember: GuildChannel | null = null;
+  // let channelWithMember: GuildChannel | null = null;
   let channelListDB = await GamingChannel.find({});
   let channelList = channelListDB.map((channel) => {
     return member.guild.channels.cache.get(channel.id) as GuildChannel;
   });
   channelList.forEach((channel) => {
     memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
-    channelWithMember = memberInCreatedChannel ? channel : null;
+    // channelWithMember = memberInCreatedChannel ? channel : null;
   });
-  return [memberInCreatedChannel ? true : false, channelWithMember];
+  return [memberInCreatedChannel ? true : false, channelList];
 };
 
 export const getMostPlayedVideogameFromList = (videogames: Videogame[]) =>
@@ -83,6 +102,7 @@ const flattenVideogames = (videogames: Videogame[]) =>
   videogames.map((videogame) => videogame.count);
 
 export default {
+  getRandomNameFromThemeNames,
   findServer,
   findVoiceCategory,
   findBotCategory,
