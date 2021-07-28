@@ -15,6 +15,15 @@ const themeNames: string[] = [
   'Terraza',
   'Pasillo',
   'Sotano',
+  'Casita del arbol',
+  'Desvan',
+  'Ático',
+  'Balcon',
+  'Escalera',
+  'Jardín',
+  'Garage',
+  'Patio trasero',
+  'Vestíbulo',
 ];
 
 export const getRandomNameFromThemeNames = () => {

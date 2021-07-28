@@ -19,6 +19,15 @@ const themeNames = [
     'Terraza',
     'Pasillo',
     'Sotano',
+    'Casita del arbol',
+    'Desvan',
+    'Ático',
+    'Balcon',
+    'Escalera',
+    'Jardín',
+    'Garage',
+    'Patio trasero',
+    'Vestíbulo',
 ];
 const getRandomNameFromThemeNames = () => {
     return lodash_1.default.sample(themeNames);
