@@ -101,16 +101,16 @@ const getChannelPlayedVideogames = (channel) => {
 exports.getChannelPlayedVideogames = getChannelPlayedVideogames;
 const isMemberPartOfCreatedChannels = async (member) => {
     let memberInCreatedChannel;
-    // let channelWithMember: GuildChannel | null = null;
+    let channelWithMember = null;
     let channelListDB = await GamingChannel_1.default.find({});
-    let channelList = channelListDB.map((channel) => {
+    let clientChannelList = channelListDB.map((channel) => {
         return member.guild.channels.cache.get(channel.id);
     });
-    channelList.forEach((channel) => {
+    clientChannelList.forEach((channel) => {
         memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
-        // channelWithMember = memberInCreatedChannel ? channel : null;
+        channelWithMember = memberInCreatedChannel ? channel : null;
     });
-    return memberInCreatedChannel ? channelList : [];
+    return memberInCreatedChannel ? channelWithMember : null;
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
 const getMostPlayedVideogamesFromList = (videogames) => videogames.filter((e) => e.count >= 2);

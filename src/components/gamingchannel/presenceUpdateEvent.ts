@@ -8,34 +8,34 @@ import {
   changeChannelName,
 } from '../../util';
 
-const checkAllChannelsNames = async (channels: GuildChannel[]) => {
+
+const checkChannelName = async (channel: GuildChannel) => {
   let videogames: Videogame[] | null = [];
-  for (let idx = 0; idx < channels.length; idx++) {
-    videogames = getChannelPlayedVideogames(channels[idx]);
+    videogames = getChannelPlayedVideogames(channel);
     // If a videogame is being played on the server, we will show it
     if (videogames && videogames.length) {
       let mostPlayedVideogames: Videogame[] = getMostPlayedVideogamesFromList(videogames);
       if (mostPlayedVideogames.length === 1) {
         console.log(
-          chalk.cyanBright(`The channel ${channels[idx].name} has changed its primary videogame`),
+          chalk.cyanBright(`The channel ${channel.name} has changed its primary videogame`),
         );
-        changeChannelName(channels[idx], `🔊︱${mostPlayedVideogames[0].name}`);
+        changeChannelName(channel, `🔊︱${mostPlayedVideogames.shift()?.name}`);
       }
     }
-  }
+  
 };
 
 const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   let member = oldPresence?.member;
   if (member) {
-    let channels = await isMemberPartOfCreatedChannels(member);
-    if (channels && channels.length) {
+    let channel = await isMemberPartOfCreatedChannels(member);
+    if (channel) {
       console.log(
         chalk.cyanBright(
-          `A new member from a created channel has changed their presence... Checking all created lobbies`,
+          `A new member from a ${channel.name} has changed their presence...`,
         ),
       );
-      checkAllChannelsNames(channels);
+      checkChannelName(channel);
     }
   }
 };
