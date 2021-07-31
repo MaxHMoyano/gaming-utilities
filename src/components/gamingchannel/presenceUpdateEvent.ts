@@ -16,10 +16,11 @@ const checkChannelName = async (channel: GuildChannel) => {
     if (videogames && videogames.length) {
       let mostPlayedVideogames: Videogame[] = getMostPlayedVideogamesFromList(videogames);
       if (mostPlayedVideogames.length === 1) {
+        const mostPlayedVideogameName = mostPlayedVideogames[0].name
         console.log(
-          chalk.cyanBright(`The channel ${channel.name} has changed its primary videogame`),
+          chalk.cyanBright(`More than 2 people are playing ${mostPlayedVideogameName} in ${channel.name}\n Changing channel name`),
         );
-        changeChannelName(channel, `🔊︱${mostPlayedVideogames.shift()?.name}`);
+        changeChannelName(channel, `🔊︱${mostPlayedVideogameName}`);
       }
     }
   

@@ -10,12 +10,10 @@ const voiceUpdateEvent = async (
   createPartyChannel: GuildChannel | undefined,
 ) => {
   if (newVoiceState.channel && newVoiceState.channel.id === createPartyChannel?.id) {
-    let videogames = newVoiceState.member?.presence.activities.filter(
-      (activity) => activity.type === 'PLAYING',
-    );
-    let channelName = videogames?.length
-      ? `🔊︱${videogames[0].name}`
-      : `🔊︱${getRandomNameFromThemeNames()}`;
+    // let videogames = newVoiceState.member?.presence.activities.filter(
+    //   (activity) => activity.type === 'PLAYING',
+    // );
+    let channelName = `🔊︱${getRandomNameFromThemeNames()}`;
     let newChannel = await newVoiceState.guild.channels.create(channelName, {
       type: 'voice',
       parent: voiceCategory,
