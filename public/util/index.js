@@ -83,15 +83,15 @@ const getChannelPlayedVideogames = (channel) => {
     if (activities.length) {
         activities.forEach((activity) => {
             let gameIdx = videogames.findIndex((videogame) => videogame.id === activity.applicationID);
-            if (gameIdx !== -1) {
-                videogames[gameIdx].count++;
-            }
-            else {
+            if (gameIdx === -1) {
                 videogames.push({
                     name: activity.name,
                     id: activity.applicationID,
                     count: 1,
                 });
+            }
+            else {
+                videogames[gameIdx].count += 1;
             }
         });
         return videogames;

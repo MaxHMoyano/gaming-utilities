@@ -13,7 +13,7 @@ const checkChannelName = async (channel) => {
         let mostPlayedVideogames = util_1.getMostPlayedVideogamesFromList(videogames);
         if (mostPlayedVideogames.length === 1) {
             const mostPlayedVideogameName = mostPlayedVideogames[0].name;
-            console.log(chalk_1.default.cyanBright(`More than 2 people are playing ${mostPlayedVideogameName} in ${channel.name}\n Changing channel name`));
+            console.log(chalk_1.default.cyanBright(`More than 2 people are playing ${mostPlayedVideogameName} in a channel`));
             util_1.changeChannelName(channel, `🔊︱${mostPlayedVideogameName}`);
         }
     }

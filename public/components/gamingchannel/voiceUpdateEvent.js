@@ -18,7 +18,6 @@ const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, cre
             position: 2,
         });
         await GamingChannel_1.default.create({
-            name: newChannel.name,
             _id: newChannel.id,
         });
         console.log(chalk_1.default.greenBright(`New channel ${newChannel.name} created`));
