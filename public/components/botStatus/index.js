@@ -18,9 +18,11 @@ const init = async (client) => {
         //
         let timbaChannel = client.channels.cache.get('887769728137982002');
         // setTimeout(() => {
-        setTimeout(() => {
-            timbaChannel?.send('$w');
-        }, 1000);
+        for (let index = 0; index < 10; index++) {
+            setTimeout(() => {
+                timbaChannel?.send('$w');
+            }, 1000);
+        }
         // }, 600000);
     });
     client.on('error', (err) => { });

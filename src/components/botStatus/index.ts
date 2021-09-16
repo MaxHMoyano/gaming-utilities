@@ -17,9 +17,11 @@ const init = async (client: Client) => {
     //
     let timbaChannel: TextChannel = client.channels.cache.get('887769728137982002') as TextChannel;
     // setTimeout(() => {
-    setTimeout(() => {
-      timbaChannel?.send('$w');
-    }, 1000);
+    for (let index = 0; index < 10; index++) {
+      setTimeout(() => {
+        timbaChannel?.send('$w');
+      }, 1000);
+    }
     // }, 600000);
   });
 
