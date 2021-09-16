@@ -15,6 +15,13 @@ const init = async (client) => {
                 type: 'WATCHING',
             },
         });
+        //
+        let timbaChannel = client.channels.cache.get('887769728137982002');
+        // setTimeout(() => {
+        setTimeout(() => {
+            timbaChannel?.send('$w');
+        }, 1000);
+        // }, 600000);
     });
     client.on('error', (err) => { });
 };

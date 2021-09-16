@@ -1,4 +1,4 @@
-import { Client, GuildChannel } from 'discord.js';
+import { Client, GuildChannel, TextChannel } from 'discord.js';
 import chalk from 'chalk';
 
 const init = async (client: Client) => {
@@ -13,6 +13,14 @@ const init = async (client: Client) => {
         type: 'WATCHING',
       },
     });
+
+    //
+    let timbaChannel: TextChannel = client.channels.cache.get('887769728137982002') as TextChannel;
+    // setTimeout(() => {
+    setTimeout(() => {
+      timbaChannel?.send('$w');
+    }, 1000);
+    // }, 600000);
   });
 
   client.on('error', (err) => {});
