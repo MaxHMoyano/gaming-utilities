@@ -89,6 +89,9 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
         videogames[gameIdx].count += 1;
       }
     });
+    videogames = videogames
+      .filter((e) => e.count >= 2)
+      .sort((a, b) => (a.count > b.count ? 1 : -1));
     return videogames;
   }
   return null;
@@ -110,9 +113,6 @@ export const isMemberPartOfCreatedChannels = async (
   return memberInCreatedChannel ? channelWithMember : null;
 };
 
-export const getMostPlayedVideogamesFromList = (videogames: Videogame[]) =>
-  videogames.filter((e) => e.count >= 2);
-
 export default {
   getRandomNameFromThemeNames,
   findServer,
@@ -123,5 +123,4 @@ export default {
   isTextChannelAlreadyCreated,
   deleteOldMessagesFromChannel,
   getChannelPlayedVideogames,
-  getMostPlayedVideogamesFromList,
 };

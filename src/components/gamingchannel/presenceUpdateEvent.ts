@@ -1,29 +1,24 @@
 import chalk from 'chalk';
 import { GuildChannel, Presence } from 'discord.js';
 import { Videogame } from '../../models';
+import GamingChannel from '../../models/GamingChannel';
 import {
   getChannelPlayedVideogames,
   isMemberPartOfCreatedChannels,
-  getMostPlayedVideogamesFromList,
   changeChannelName,
+  getRandomNameFromThemeNames,
 } from '../../util';
 
-
 const checkChannelName = async (channel: GuildChannel) => {
+  let databaseChannel = await GamingChannel.findById(channel.id);
   let videogames: Videogame[] | null = [];
+  if (!databaseChannel?.hasChanged) {
     videogames = getChannelPlayedVideogames(channel);
-    // If a videogame is being played on the server, we will show it
-    if (videogames && videogames.length) {
-      let mostPlayedVideogames: Videogame[] = getMostPlayedVideogamesFromList(videogames);
-      if (mostPlayedVideogames.length === 1) {
-        const mostPlayedVideogameName = mostPlayedVideogames[0].name
-        console.log(
-          chalk.cyanBright(`More than 2 people are playing ${mostPlayedVideogameName} in a channel`)
-        );
-        changeChannelName(channel, `🔊︱${mostPlayedVideogameName}`);
-      }
+    if ((videogames?.length && videogames[0].name != channel.name) || !videogames?.length) {
+      await databaseChannel?.update({ hasChanged: true });
+      changeChannelName(channel, `🔊︱${getRandomNameFromThemeNames()}`);
     }
-  
+  }
 };
 
 const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
@@ -31,11 +26,7 @@ const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   if (member) {
     let channel = await isMemberPartOfCreatedChannels(member);
     if (channel) {
-      console.log(
-        chalk.cyanBright(
-          `A new member from a ${channel.name} has changed their presence...`,
-        ),
-      );
+      // A new member from a ${channel.name} has changed their presence
       checkChannelName(channel);
     }
   }
