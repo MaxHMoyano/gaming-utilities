@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMostPlayedVideogamesFromList = exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = exports.changeChannelName = exports.getRandomNameFromThemeNames = void 0;
+exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = exports.changeChannelName = exports.getRandomNameFromThemeNames = void 0;
 const GamingChannel_1 = __importDefault(require("../models/GamingChannel"));
 const lodash_1 = __importDefault(require("lodash"));
 const themeNames = [
@@ -94,6 +94,9 @@ const getChannelPlayedVideogames = (channel) => {
                 videogames[gameIdx].count += 1;
             }
         });
+        videogames = videogames
+            .filter((e) => e.count >= 2)
+            .sort((a, b) => (a.count > b.count ? 1 : -1));
         return videogames;
     }
     return null;
@@ -113,8 +116,6 @@ const isMemberPartOfCreatedChannels = async (member) => {
     return memberInCreatedChannel ? channelWithMember : null;
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
-const getMostPlayedVideogamesFromList = (videogames) => videogames.filter((e) => e.count >= 2);
-exports.getMostPlayedVideogamesFromList = getMostPlayedVideogamesFromList;
 exports.default = {
     getRandomNameFromThemeNames: exports.getRandomNameFromThemeNames,
     findServer: exports.findServer,
@@ -125,5 +126,4 @@ exports.default = {
     isTextChannelAlreadyCreated: exports.isTextChannelAlreadyCreated,
     deleteOldMessagesFromChannel: exports.deleteOldMessagesFromChannel,
     getChannelPlayedVideogames: exports.getChannelPlayedVideogames,
-    getMostPlayedVideogamesFromList: exports.getMostPlayedVideogamesFromList,
 };

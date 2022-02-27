@@ -11,7 +11,7 @@ const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, cre
         let videogames = newVoiceState.member?.presence.activities.filter((activity) => activity.type === 'PLAYING');
         let channelName = videogames?.length
             ? `${videogames[0].name}`
-            : `🔊︱${util_1.getRandomNameFromThemeNames()}`;
+            : `🔊︱${(0, util_1.getRandomNameFromThemeNames)()}`;
         let newChannel = await newVoiceState.guild.channels.create(channelName, {
             type: 'voice',
             parent: voiceCategory,
@@ -19,6 +19,7 @@ const voiceUpdateEvent = async (oldVoiceState, newVoiceState, voiceCategory, cre
         });
         await GamingChannel_1.default.create({
             _id: newChannel.id,
+            hasChanged: !videogames?.length,
         });
         console.log(chalk_1.default.greenBright(`New channel ${newChannel.name} created`));
         newVoiceState.member?.voice.setChannel(newChannel);

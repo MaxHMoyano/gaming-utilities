@@ -13,15 +13,15 @@ const init = async (client) => {
     console.log(chalk_1.default.yellowBright('Module GamingChannels initiated'));
     // When the bot is ready and starts
     client.on('ready', async () => {
-        [voiceCategory, createPartyChannel] = await readyEvent_1.default(client, voiceCategory, createPartyChannel);
+        [voiceCategory, createPartyChannel] = await (0, readyEvent_1.default)(client, voiceCategory, createPartyChannel);
     });
     // Everytime a member changes from channel to channel
     client.on('voiceStateUpdate', async (oldState, newState) => {
-        await voiceUpdateEvent_1.default(oldState, newState, voiceCategory, createPartyChannel);
+        await (0, voiceUpdateEvent_1.default)(oldState, newState, voiceCategory, createPartyChannel);
     });
     // Everytime a member updates their rich presence
     client.on('presenceUpdate', (oldPresence) => {
-        presenceUpdateEvent_1.default(oldPresence);
+        (0, presenceUpdateEvent_1.default)(oldPresence);
     });
     client.on('error', (err) => { });
 };

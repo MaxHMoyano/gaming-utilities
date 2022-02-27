@@ -23,7 +23,7 @@ const voiceUpdateEvent = async (
     });
     await GamingChannel.create({
       _id: newChannel.id,
-      hasChanged: false,
+      hasChanged: !videogames?.length,
     });
     console.log(chalk.greenBright(`New channel ${newChannel.name} created`));
     newVoiceState.member?.voice.setChannel(newChannel);

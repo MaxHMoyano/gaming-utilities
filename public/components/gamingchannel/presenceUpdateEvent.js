@@ -3,27 +3,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const chalk_1 = __importDefault(require("chalk"));
+const GamingChannel_1 = __importDefault(require("../../models/GamingChannel"));
 const util_1 = require("../../util");
 const checkChannelName = async (channel) => {
+    let databaseChannel = await GamingChannel_1.default.findById(channel.id);
     let videogames = [];
-    videogames = util_1.getChannelPlayedVideogames(channel);
-    // If a videogame is being played on the server, we will show it
-    if (videogames && videogames.length) {
-        let mostPlayedVideogames = util_1.getMostPlayedVideogamesFromList(videogames);
-        if (mostPlayedVideogames.length === 1) {
-            const mostPlayedVideogameName = mostPlayedVideogames[0].name;
-            console.log(chalk_1.default.cyanBright(`More than 2 people are playing ${mostPlayedVideogameName} in a channel`));
-            util_1.changeChannelName(channel, `🔊︱${mostPlayedVideogameName}`);
+    if (!databaseChannel?.hasChanged) {
+        videogames = (0, util_1.getChannelPlayedVideogames)(channel);
+        if ((videogames?.length && videogames[0].name != channel.name) || !videogames?.length) {
+            await databaseChannel?.update({ hasChanged: true });
+            (0, util_1.changeChannelName)(channel, `🔊︱${(0, util_1.getRandomNameFromThemeNames)()}`);
         }
     }
 };
 const presenceUpdateEvent = async (oldPresence) => {
     let member = oldPresence?.member;
     if (member) {
-        let channel = await util_1.isMemberPartOfCreatedChannels(member);
+        let channel = await (0, util_1.isMemberPartOfCreatedChannels)(member);
         if (channel) {
-            console.log(chalk_1.default.cyanBright(`A new member from a ${channel.name} has changed their presence...`));
+            // A new member from a ${channel.name} has changed their presence
             checkChannelName(channel);
         }
     }

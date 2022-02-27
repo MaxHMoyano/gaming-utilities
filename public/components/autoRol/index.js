@@ -12,12 +12,12 @@ const init = async (client) => {
     let rolMessage;
     // When the bot is ready and starts
     client.on('ready', async () => {
-        const server = util_1.findServer(client);
+        const server = (0, util_1.findServer)(client);
         rolMessage = await onReady(server);
     });
     // Everytime a member reacts to a message
     client.on('messageReactionAdd', async (reaction, user) => {
-        const server = util_1.findServer(client);
+        const server = (0, util_1.findServer)(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
             let guildUser = server?.members.cache.get(user.id);
             let roleToAdd = await findRoleByReaction(server, reaction);
@@ -28,7 +28,7 @@ const init = async (client) => {
         }
     });
     client.on('messageReactionRemove', async (reaction, user) => {
-        const server = util_1.findServer(client);
+        const server = (0, util_1.findServer)(client);
         if (reaction.message === rolMessage && user.id !== '720067757412188181') {
             let guildUser = server?.members.cache.get(user.id);
             let roleToAdd = await findRoleByReaction(server, reaction);
@@ -59,7 +59,7 @@ const onReady = async (server) => {
             .setTitle(`${description}\n\nReacciona para obtener el rol!\n\n\n`)
             .setColor('DARK_GOLD')
             .setDescription(`${roles.reduce(getMessageFromRoles, '')}`);
-        await util_1.deleteOldMessagesFromChannel(autoRolChannel);
+        await (0, util_1.deleteOldMessagesFromChannel)(autoRolChannel);
         const rolMessage = await autoRolChannel?.send(message);
         await createReactions(rolMessage, server, roles);
         return rolMessage;
@@ -73,9 +73,9 @@ const getRolesFromDb = async (server) => {
     });
 };
 const getAutoRolChannel = async (server, description) => {
-    const botCategory = util_1.findBotCategory(server);
+    const botCategory = (0, util_1.findBotCategory)(server);
     let name = '🤖︱elegi-tu-rol';
-    let textChannel = util_1.isTextChannelAlreadyCreated(server, name);
+    let textChannel = (0, util_1.isTextChannelAlreadyCreated)(server, name);
     if (textChannel) {
         return textChannel;
     }
@@ -91,7 +91,7 @@ const getMessageFromRoles = (acc, current) => {
 };
 const createReactions = async (message, server, roles) => {
     roles.forEach((role) => {
-        let icon = util_1.getEmojiByName(server, role.icon);
+        let icon = (0, util_1.getEmojiByName)(server, role.icon);
         if (icon) {
             message?.react(icon?.id);
         }

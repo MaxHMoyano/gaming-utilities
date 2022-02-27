@@ -7,4 +7,4 @@ const Rol = new mongoose_1.Schema({
     displayName: { type: String, required: [true, 'El nombre del rol creado es obligatorio'] },
     icon: { type: String, required: [true, 'El icono del rol es obligatorio'] },
 });
-exports.default = mongoose_1.model('Roles', Rol);
+exports.default = (0, mongoose_1.model)('Roles', Rol);
