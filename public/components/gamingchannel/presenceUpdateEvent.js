@@ -11,7 +11,7 @@ const checkChannelName = async (channel) => {
     if (!databaseChannel?.hasChanged) {
         videogames = (0, util_1.getChannelPlayedVideogames)(channel);
         if ((videogames?.length && videogames[0].name != channel.name) || !videogames?.length) {
-            await databaseChannel?.update({ hasChanged: true });
+            await databaseChannel?.updateOne({ hasChanged: true });
             (0, util_1.changeChannelName)(channel, `🔊︱${(0, util_1.getRandomNameFromThemeNames)()}`);
         }
     }
@@ -21,7 +21,7 @@ const presenceUpdateEvent = async (oldPresence) => {
     if (member) {
         let channel = await (0, util_1.isMemberPartOfCreatedChannels)(member);
         if (channel) {
-            // A new member from a ${channel.name} has changed their presence
+            console.log(`A new member from a ${channel.name} has changed their presence`);
             checkChannelName(channel);
         }
     }

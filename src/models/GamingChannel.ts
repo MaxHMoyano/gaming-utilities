@@ -7,7 +7,7 @@ export interface IGamingChannel extends Document {
 
 const GamingChannel = new Schema({
   _id: { type: String, required: [true, 'El id es obligatorio'] },
-  hasChanged: { type: String },
+  hasChanged: { type: Boolean },
 });
 
 export default model<IGamingChannel>('GamingChannel', GamingChannel);

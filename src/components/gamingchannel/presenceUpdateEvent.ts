@@ -15,7 +15,7 @@ const checkChannelName = async (channel: GuildChannel) => {
   if (!databaseChannel?.hasChanged) {
     videogames = getChannelPlayedVideogames(channel);
     if ((videogames?.length && videogames[0].name != channel.name) || !videogames?.length) {
-      await databaseChannel?.update({ hasChanged: true });
+      await databaseChannel?.updateOne({ hasChanged: true });
       changeChannelName(channel, `🔊︱${getRandomNameFromThemeNames()}`);
     }
   }
@@ -26,7 +26,7 @@ const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   if (member) {
     let channel = await isMemberPartOfCreatedChannels(member);
     if (channel) {
-      // A new member from a ${channel.name} has changed their presence
+      console.log(`A new member from a ${channel.name} has changed their presence`);
       checkChannelName(channel);
     }
   }
