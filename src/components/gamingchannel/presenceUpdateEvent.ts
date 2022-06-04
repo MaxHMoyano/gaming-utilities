@@ -4,7 +4,7 @@ import { Videogame } from '../../models';
 import GamingChannel from '../../models/GamingChannel';
 import {
   getChannelPlayedVideogames,
-  isMemberPartOfCreatedChannels,
+  isMemberPartOfCreatedChannels as isMemberCreatorOfAChannel,
   changeChannelName,
   getRandomNameFromThemeNames,
 } from '../../util';
@@ -24,9 +24,8 @@ const checkChannelName = async (channel: GuildChannel) => {
 const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
   let member = oldPresence?.member;
   if (member) {
-    let channel = await isMemberPartOfCreatedChannels(member);
+    let channel = await isMemberCreatorOfAChannel(member);
     if (channel) {
-      console.log(`A new member from a ${channel.name} has changed their presence`);
       checkChannelName(channel);
     }
   }

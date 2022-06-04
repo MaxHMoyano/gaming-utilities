@@ -103,17 +103,11 @@ const getChannelPlayedVideogames = (channel) => {
 };
 exports.getChannelPlayedVideogames = getChannelPlayedVideogames;
 const isMemberPartOfCreatedChannels = async (member) => {
-    let memberInCreatedChannel;
-    let channelWithMember = null;
-    let channelListDB = await GamingChannel_1.default.find({});
-    let clientChannelList = channelListDB.map((channel) => {
-        return member.guild.channels.cache.get(channel.id);
-    });
-    clientChannelList.forEach((channel) => {
-        memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
-        channelWithMember = memberInCreatedChannel ? channel : null;
-    });
-    return memberInCreatedChannel ? channelWithMember : null;
+    let dbChannel = await GamingChannel_1.default.findOne({ creator: member.id });
+    if (dbChannel) {
+        return member.guild.channels.cache.get(dbChannel._id);
+    }
+    return null;
 };
 exports.isMemberPartOfCreatedChannels = isMemberPartOfCreatedChannels;
 exports.default = {

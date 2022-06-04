@@ -98,19 +98,13 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
 };
 
 export const isMemberPartOfCreatedChannels = async (
-  member: GuildMember,
-): Promise<GuildChannel | null> => {
-  let memberInCreatedChannel: GuildMember | undefined;
-  let channelWithMember: GuildChannel | null = null;
-  let channelListDB = await GamingChannel.find({});
-  let clientChannelList = channelListDB.map((channel) => {
-    return member.guild.channels.cache.get(channel.id) as GuildChannel;
-  });
-  clientChannelList.forEach((channel) => {
-    memberInCreatedChannel = channel.members.array().find((e) => e.id === member?.id);
-    channelWithMember = memberInCreatedChannel ? channel : null;
-  });
-  return memberInCreatedChannel ? channelWithMember : null;
+  member: GuildMember
+): Promise<GuildChannel | undefined | null> => {
+  let dbChannel = await GamingChannel.findOne({ creator: member.id });
+  if (dbChannel) {
+    return member.guild.channels.cache.get(dbChannel._id)
+  }
+  return null
 };
 
 export default {

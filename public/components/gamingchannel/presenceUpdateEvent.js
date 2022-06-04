@@ -21,7 +21,6 @@ const presenceUpdateEvent = async (oldPresence) => {
     if (member) {
         let channel = await (0, util_1.isMemberPartOfCreatedChannels)(member);
         if (channel) {
-            console.log(`A new member from a ${channel.name} has changed their presence`);
             checkChannelName(channel);
         }
     }

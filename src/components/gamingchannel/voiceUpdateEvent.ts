@@ -1,4 +1,4 @@
-import { VoiceState, GuildChannel } from 'discord.js';
+import { VoiceState, GuildChannel, GuildMember } from 'discord.js';
 import chalk from 'chalk';
 import GamingChannel from '../../models/GamingChannel';
 import { getRandomNameFromThemeNames } from '../../util';
@@ -24,6 +24,7 @@ const voiceUpdateEvent = async (
     await GamingChannel.create({
       _id: newChannel.id,
       hasChanged: !videogames?.length,
+      creator: newVoiceState.member?.id as string
     });
     console.log(chalk.greenBright(`New channel ${newChannel.name} created`));
     newVoiceState.member?.voice.setChannel(newChannel);
