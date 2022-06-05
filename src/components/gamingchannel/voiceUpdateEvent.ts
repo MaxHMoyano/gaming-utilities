@@ -1,6 +1,6 @@
 import { VoiceState, GuildChannel, GuildMember } from 'discord.js';
 import chalk from 'chalk';
-import GamingChannel from '../../models/GamingChannel';
+import { GamingChannelModel } from '../../models/GamingChannel';
 import { getRandomNameFromThemeNames } from '../../util';
 
 const voiceUpdateEvent = async (
@@ -21,19 +21,19 @@ const voiceUpdateEvent = async (
       parent: voiceCategory,
       position: 2,
     });
-    await GamingChannel.create({
-      _id: newChannel.id,
+    await GamingChannelModel.create({
+      channelId: newChannel.id,
       hasChanged: !videogames?.length,
-      creator: newVoiceState.member?.id as string
+      creator: newVoiceState.member?.id as string,
     });
     console.log(chalk.greenBright(`New channel ${newChannel.name} created`));
     newVoiceState.member?.voice.setChannel(newChannel);
   }
   if (oldVoiceState.channel) {
-    let dbChannel = await GamingChannel.findById(oldVoiceState.channel.id);
+    let dbChannel = await GamingChannelModel.findById(oldVoiceState.channel.id);
     let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.id);
     if (channel && channel.members.array().length === 0) {
-      await GamingChannel.findByIdAndDelete(channel.id);
+      await GamingChannelModel.findByIdAndDelete(channel.id);
       await channel.delete();
       console.log(chalk.redBright(`${channel.name} Deleted`));
     }

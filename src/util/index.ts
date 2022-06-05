@@ -1,7 +1,9 @@
 import { Client, Guild, Activity, GuildChannel, GuildMember, TextChannel } from 'discord.js';
 import { Videogame } from '../models';
-import GamingChannel from '../models/GamingChannel';
+import { GamingChannelModel } from '../models/GamingChannel';
 import _ from 'lodash';
+import { MAIN_CHAT_ID } from './constants';
+import { MessageModel } from '../models/Message';
 const themeNames: string[] = [
   'Cocina',
   'Comedor',
@@ -47,7 +49,7 @@ export const findVoiceCategory = (server?: Guild) => {
 };
 
 export const findBotCategory = (server?: Guild) => {
-  return server?.channels.cache.get('733385675986173984');
+  return server?.channels.cache.get(MAIN_CHAT_ID);
 };
 
 export const isTextChannelAlreadyCreated = (server?: Guild, name?: string) => {
@@ -59,12 +61,9 @@ export const deleteOldMessagesFromChannel = async (channel: TextChannel | undefi
     const previousMessages = await channel?.messages.fetch();
     if (previousMessages) {
       channel?.bulkDelete(previousMessages);
+      await MessageModel.deleteMany({});
     }
   }
-};
-
-export const getEmojiByName = (server: Guild | undefined, iconName: string) => {
-  return server?.emojis.cache.find((e) => e.name === iconName);
 };
 
 export const getChannelPlayedVideogames = (channel: GuildChannel) => {
@@ -98,13 +97,13 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
 };
 
 export const isMemberPartOfCreatedChannels = async (
-  member: GuildMember
+  member: GuildMember,
 ): Promise<GuildChannel | undefined | null> => {
-  let dbChannel = await GamingChannel.findOne({ creator: member.id });
+  let dbChannel = await GamingChannelModel.findOne({ creator: member.id });
   if (dbChannel) {
-    return member.guild.channels.cache.get(dbChannel._id)
+    return member.guild.channels.cache.get(dbChannel.channelId);
   }
-  return null
+  return null;
 };
 
 export default {
@@ -113,7 +112,6 @@ export default {
   changeChannelName,
   findVoiceCategory,
   findBotCategory,
-  getEmojiByName,
   isTextChannelAlreadyCreated,
   deleteOldMessagesFromChannel,
   getChannelPlayedVideogames,
