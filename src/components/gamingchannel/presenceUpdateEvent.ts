@@ -10,7 +10,7 @@ import {
 } from '../../util';
 
 const checkChannelName = async (channel: GuildChannel) => {
-  let databaseChannel = await GamingChannelModel.findById(channel.id);
+  let databaseChannel = await GamingChannelModel.findOne({ channelId: channel.id });
   let videogames: Videogame[] | null = [];
   if (!databaseChannel?.hasChanged) {
     videogames = getChannelPlayedVideogames(channel);
