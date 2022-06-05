@@ -30,10 +30,10 @@ const voiceUpdateEvent = async (
     newVoiceState.member?.voice.setChannel(newChannel);
   }
   if (oldVoiceState.channel) {
-    let dbChannel = await GamingChannelModel.findById(oldVoiceState.channel.id);
-    let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.id);
+    let dbChannel = await GamingChannelModel.findOne({ channelId: oldVoiceState.channel.id });
+    let channel = oldVoiceState.guild.channels.cache.get(dbChannel?.channelId as string);
     if (channel && channel.members.array().length === 0) {
-      await GamingChannelModel.findByIdAndDelete(channel.id);
+      await GamingChannelModel.findOneAndDelete({ channelId: channel.id });
       await channel.delete();
       console.log(chalk.redBright(`${channel.name} Deleted`));
     }
