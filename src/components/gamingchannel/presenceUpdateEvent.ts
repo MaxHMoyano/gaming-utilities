@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { GuildChannel, Presence } from 'discord.js';
 import { Videogame } from '../../models';
-import GamingChannel from '../../models/GamingChannel';
+import { GamingChannelModel } from '../../models/GamingChannel';
 import {
   getChannelPlayedVideogames,
   isMemberPartOfCreatedChannels as isMemberCreatorOfAChannel,
@@ -10,7 +10,7 @@ import {
 } from '../../util';
 
 const checkChannelName = async (channel: GuildChannel) => {
-  let databaseChannel = await GamingChannel.findById(channel.id);
+  let databaseChannel = await GamingChannelModel.findById(channel.id);
   let videogames: Videogame[] | null = [];
   if (!databaseChannel?.hasChanged) {
     videogames = getChannelPlayedVideogames(channel);

@@ -3,9 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.getEmojiByName = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = exports.changeChannelName = exports.getRandomNameFromThemeNames = void 0;
-const GamingChannel_1 = __importDefault(require("../models/GamingChannel"));
+exports.isMemberPartOfCreatedChannels = exports.getChannelPlayedVideogames = exports.deleteOldMessagesFromChannel = exports.isTextChannelAlreadyCreated = exports.findBotCategory = exports.findVoiceCategory = exports.findServer = exports.changeChannelName = exports.getRandomNameFromThemeNames = void 0;
+const GamingChannel_1 = require("../models/GamingChannel");
 const lodash_1 = __importDefault(require("lodash"));
+const constants_1 = require("./constants");
+const Message_1 = require("../models/Message");
 const themeNames = [
     'Cocina',
     'Comedor',
@@ -50,7 +52,7 @@ const findVoiceCategory = (server) => {
 };
 exports.findVoiceCategory = findVoiceCategory;
 const findBotCategory = (server) => {
-    return server?.channels.cache.get('733385675986173984');
+    return server?.channels.cache.get(constants_1.MAIN_CHAT_ID);
 };
 exports.findBotCategory = findBotCategory;
 const isTextChannelAlreadyCreated = (server, name) => {
@@ -63,14 +65,11 @@ const deleteOldMessagesFromChannel = async (channel) => {
         const previousMessages = await channel?.messages.fetch();
         if (previousMessages) {
             channel?.bulkDelete(previousMessages);
+            await Message_1.MessageModel.deleteMany({});
         }
     }
 };
 exports.deleteOldMessagesFromChannel = deleteOldMessagesFromChannel;
-const getEmojiByName = (server, iconName) => {
-    return server?.emojis.cache.find((e) => e.name === iconName);
-};
-exports.getEmojiByName = getEmojiByName;
 const getChannelPlayedVideogames = (channel) => {
     let videogames = [];
     let activities = [];
@@ -103,9 +102,9 @@ const getChannelPlayedVideogames = (channel) => {
 };
 exports.getChannelPlayedVideogames = getChannelPlayedVideogames;
 const isMemberPartOfCreatedChannels = async (member) => {
-    let dbChannel = await GamingChannel_1.default.findOne({ creator: member.id });
+    let dbChannel = await GamingChannel_1.GamingChannelModel.findOne({ creator: member.id });
     if (dbChannel) {
-        return member.guild.channels.cache.get(dbChannel._id);
+        return member.guild.channels.cache.get(dbChannel.channelId);
     }
     return null;
 };
@@ -116,7 +115,6 @@ exports.default = {
     changeChannelName: exports.changeChannelName,
     findVoiceCategory: exports.findVoiceCategory,
     findBotCategory: exports.findBotCategory,
-    getEmojiByName: exports.getEmojiByName,
     isTextChannelAlreadyCreated: exports.isTextChannelAlreadyCreated,
     deleteOldMessagesFromChannel: exports.deleteOldMessagesFromChannel,
     getChannelPlayedVideogames: exports.getChannelPlayedVideogames,
