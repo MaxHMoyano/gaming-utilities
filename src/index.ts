@@ -11,5 +11,5 @@ db.connect().then(() => {
   client.login(process.env.TOKEN);
   botStatus.init(client);
   gamingChannel.init(client);
-  autoRol.init(client);
+  // autoRol.init(client);
 });
