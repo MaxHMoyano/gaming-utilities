@@ -9,13 +9,14 @@ const Message_1 = require("../../models/Message");
 const Role_1 = require("../../models/Role");
 const util_1 = require("../../util");
 const constants_1 = require("../../util/constants");
-let IS_MESSAGE_STILL_REACTING = false;
+let AUTO_ROL_CHANNEL = undefined;
 const init = async (client) => {
     console.log(chalk_1.default.yellowBright('Module AutoRol initiated'));
     // When the bot is ready and starts
     client.on('ready', async () => {
         const guild = (0, util_1.findServer)(client);
-        await initGameRoles(guild);
+        AUTO_ROL_CHANNEL = await getAutoRolChannel(guild);
+        await onReady(guild);
     });
     // Everytime a member reacts to a message
     client.on('messageReactionAdd', async (reaction, user) => {
@@ -46,127 +47,188 @@ const init = async (client) => {
             }
         }
     });
-    client.on('roleCreate', async (role) => {
-        if (role.name.includes('g: ')) {
-            console.log('A videogame role was updated/created');
-            const guild = (0, util_1.findServer)(client);
-            while (IS_MESSAGE_STILL_REACTING === false) {
-                await initGameRoles(guild);
-            }
-        }
-    });
     client.on('roleUpdate', async (previous, current) => {
         if (current.name.includes('g: ') && current.name !== previous.name) {
             console.log('A videogame role was updated/created');
-            const guild = (0, util_1.findServer)(client);
-            while (IS_MESSAGE_STILL_REACTING === false) {
-                await initGameRoles(guild);
-            }
+            editExistingRole(current, current.guild);
         }
     });
     client.on('roleDelete', async (role) => {
         if (role.name.includes('g: ')) {
             console.log('A videogame role was deleted');
             const guild = (0, util_1.findServer)(client);
-            while (IS_MESSAGE_STILL_REACTING === false) {
-                await initGameRoles(guild);
-            }
+            await onReady(guild);
         }
     });
 };
 exports.default = {
     init,
 };
-const initGameRoles = async (guild) => {
-    if (guild) {
-        let clientGameRoles = await getClientGameRoles(guild);
-        await createDbRoles(clientGameRoles);
-        await onReady(guild);
-    }
-};
-const getClientGameRoles = async (guild) => {
+const getGuildGameRoles = (guild) => {
     let gameRoles = guild?.roles.cache.filter((role) => {
         return role.name.includes('g: ');
     });
-    console.log(gameRoles.size);
     return gameRoles.array();
 };
-const createDbRoles = async (roles) => {
-    let emojiIdx = 0;
-    let dbRoles = roles?.map((role, idx) => {
-        if (idx % 20 === 0) {
-            emojiIdx = 0;
-        }
-        return {
+const createRolesByDiscordRoles = (roles) => {
+    return roles?.map((role, idx) => {
+        return new Role_1.RoleModel({
             name: role.name.substring(2),
             roleId: role.id,
-            emoji: String.fromCodePoint(constants_1.ROLES_ORDER[emojiIdx++].codePointAt(0) - 65 + 0x1f1e6),
-            order: idx,
-        };
+            emoji: convertCharToEmoji(constants_1.ROLES_ORDER[idx % 20]),
+            role: idx,
+        });
     });
-    await Role_1.RoleModel.deleteMany({});
-    await Role_1.RoleModel.create(dbRoles);
 };
-const getDbRoles = async () => {
-    return await Role_1.RoleModel.find({}).sort({ order: 1 });
+const createRoleByDiscordRole = async (role) => {
+    let availableMessage = (await findAvailableMessage(role.guild));
+    let idx = availableMessage.roles.length;
+    return new Role_1.RoleModel({
+        name: role.name.substring(2),
+        roleId: role.id,
+        emoji: convertCharToEmoji(constants_1.ROLES_ORDER[idx]),
+        order: idx,
+    });
 };
 const findRoleByDbRol = async (guild, dbRole) => {
     return guild?.roles.cache.get(dbRole.roleId);
 };
-const onReady = async (client) => {
-    IS_MESSAGE_STILL_REACTING = true;
-    const autoRolChannel = await getAutoRolChannel(client, constants_1.AUTO_ROL_DESCRIPTION);
-    const roles = await getDbRoles();
-    if (roles.length) {
-        await (0, util_1.deleteOldMessagesFromChannel)(autoRolChannel);
-        let j = 0;
-        let sliceStart = 0;
-        for (let i = 1; i <= Math.ceil(roles.length / 20); i++) {
-            let message = new discord_js_1.MessageEmbed().setTitle(`${constants_1.AUTO_ROL_DESCRIPTION}`).setColor('DARK_GOLD');
-            for (j; j < roles.length; j++) {
-                message.setDescription(`${message.description ? message.description : ''}${roles[j].emoji} ${roles[j].name}\n\n`);
-                if (20 * i - 1 === j) {
-                    break;
+const convertCharToEmoji = (char) => String.fromCodePoint(char.codePointAt(0) - 65 + 0x1f1e6);
+const createNewEmptyMessage = async (guild) => {
+    let channel = await getAutoRolChannel(guild);
+    let newMessage = new discord_js_1.MessageEmbed().setTitle(`${constants_1.AUTO_ROL_DESCRIPTION}`).setColor('DARK_GOLD');
+    return await channel?.send(newMessage);
+};
+const findAvailableMessage = async (guild) => {
+    let message = await Message_1.MessageModel.findOne({ isFull: false });
+    if (message) {
+        return message;
+    }
+    let lastMessage = (await Message_1.MessageModel.find({})).pop();
+    let lastIdx = 0;
+    if (lastMessage) {
+        lastIdx = lastMessage.order + 1;
+    }
+    let createdMessage = await createNewEmptyMessage(guild);
+    return await Message_1.MessageModel.create({
+        order: lastIdx,
+        roles: [],
+        isFull: false,
+        messageId: createdMessage?.id,
+    });
+};
+const editExistingRole = async (role, guild) => {
+    let messages = await Message_1.MessageModel.find({});
+    let existingIdx = -1;
+    let existingMessage = null;
+    let channel = await getAutoRolChannel(guild);
+    for (const message of messages) {
+        existingIdx = message.roles.findIndex((ob) => ob.roleId === role.id);
+        if (existingIdx !== -1) {
+            existingMessage = message;
+            break;
+        }
+    }
+    if (existingIdx !== -1 && existingMessage) {
+        let discordMessage = await channel?.messages.fetch(existingMessage.messageId);
+        let newRoles = existingMessage.roles.map((current) => current.roleId !== role.id
+            ? current
+            : new Role_1.RoleModel({
+                name: role.name.substring(2),
+                roleId: current.id,
+                emoji: current.emoji,
+                order: current.order,
+            }));
+        await Message_1.MessageModel.findByIdAndUpdate({ id: existingMessage?.id }, { roles: newRoles });
+        createRoleMessage(channel, newRoles, discordMessage);
+    }
+    else {
+        addRoleToAvailableMessage(role, guild);
+    }
+};
+const addRoleToAvailableMessage = async (role, guild) => {
+    const channel = await getAutoRolChannel(guild);
+    const availableMessage = await findAvailableMessage(guild);
+    const dbRole = await createRoleByDiscordRole(role);
+    if (availableMessage && channel) {
+        const newRoles = [...availableMessage.roles, dbRole];
+        const currentMessage = await channel.messages.fetch(availableMessage.messageId);
+        await availableMessage.updateOne({
+            roles: newRoles,
+            isFull: availableMessage.roles.length + 1 === 20,
+        });
+        createRoleMessage(channel, newRoles, currentMessage);
+    }
+};
+const createRoleMessage = async (channel, roles, message) => {
+    let newMessage = new discord_js_1.MessageEmbed().setTitle(`${constants_1.AUTO_ROL_DESCRIPTION}`).setColor('DARK_GOLD');
+    for (const role of roles) {
+        newMessage.setDescription(`${newMessage.description || ''}${role.emoji} - ${role.name}\n\n`);
+    }
+    if (message) {
+        let roleToAdd = verifyMessageReactions(message, roles);
+        if (roleToAdd) {
+            await message.react(roleToAdd.emoji);
+        }
+        return await message.edit(newMessage);
+    }
+    let createdMessage = await channel?.send(newMessage);
+    if (createdMessage) {
+        for (const role of roles) {
+            createdMessage.react(role.emoji);
+        }
+    }
+    return createdMessage;
+};
+const verifyMessageReactions = (message, roles) => {
+    let doesReactionExist = false;
+    for (const role of roles) {
+        console.log(role.name);
+        doesReactionExist = message.reactions.cache.some((reaction) => reaction.emoji.name === role.emoji);
+        if (!doesReactionExist) {
+            return role;
+        }
+    }
+};
+const onReady = async (guild) => {
+    if (guild) {
+        const autoRolChannel = await getAutoRolChannel(guild);
+        const gameRoles = getGuildGameRoles(guild);
+        const roles = createRolesByDiscordRoles(gameRoles);
+        if (roles.length) {
+            await (0, util_1.deleteOldMessagesFromChannel)(autoRolChannel);
+            let j = 0;
+            for (let i = 1; i <= Math.ceil(roles.length / 20); i++) {
+                let rolesToAdd = [];
+                for (j; j < roles.length; j++) {
+                    rolesToAdd = [...rolesToAdd, roles[j]];
+                    if (20 * i - 1 === j) {
+                        j++;
+                        break;
+                    }
                 }
-            }
-            const rolMessage = await autoRolChannel?.send(message);
-            await Message_1.MessageModel.create({
-                order: i,
-                messageId: rolMessage?.id,
-                roles: roles.slice(sliceStart, j + 1),
-            });
-            await createReactions(rolMessage, roles.slice(sliceStart, j + 1));
-            if (20 * i - 1 === j) {
-                sliceStart = ++j;
+                const message = await createRoleMessage(autoRolChannel, rolesToAdd);
+                await Message_1.MessageModel.create({
+                    order: i,
+                    messageId: message?.id,
+                    roles: rolesToAdd,
+                    isFull: rolesToAdd.length === 20,
+                });
             }
         }
     }
 };
-const getAutoRolChannel = async (server, description) => {
-    const botCategory = (0, util_1.findBotCategory)(server);
+const getAutoRolChannel = async (guild) => {
+    const botCategory = (0, util_1.findBotCategory)(guild);
     let name = '🤖︱auto-service';
-    let textChannel = (0, util_1.isTextChannelAlreadyCreated)(server, name);
+    let textChannel = (0, util_1.isTextChannelAlreadyCreated)(guild, name);
     if (textChannel) {
         return textChannel;
     }
-    return await server?.channels.create(name, {
+    return await guild?.channels.create(name, {
         parent: botCategory,
         position: 0,
         type: 'text',
-        topic: description,
+        topic: constants_1.AUTO_ROL_DESCRIPTION,
     });
-};
-const getMessageFromRoles = (acc, current) => {
-    return `${acc}${current.emoji} ${current.name}\n\n`;
-};
-const createReactions = async (message, roles) => {
-    for (const role of roles) {
-        try {
-            await message?.react(role.emoji);
-        }
-        catch (error) {
-            console.error('Discord message dissapeared');
-        }
-    }
-    IS_MESSAGE_STILL_REACTING = false;
 };

@@ -6,6 +6,7 @@ const Role_1 = require("./Role");
 const MessageSchema = new mongoose_1.Schema({
     messageId: String,
     order: Number,
+    isFull: Boolean,
     roles: [Role_1.RoleSchema],
 });
 exports.MessageModel = (0, mongoose_1.model)('Message', MessageSchema);
