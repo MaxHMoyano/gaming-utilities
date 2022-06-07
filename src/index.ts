@@ -9,7 +9,7 @@ dotenv.config();
 db.connect().then(() => {
   const client = new Client();
   client.login(process.env.TOKEN);
-  // botStatus.init(client);
-  // gamingChannel.init(client);
+  botStatus.init(client);
+  gamingChannel.init(client);
   autoRol.init(client);
 });
