@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv";
 import { Client, Intents } from "discord.js";
 import db from "./db";
-import gamingChannel from "./components/gamingchannel";
-import autoRol from "./components/autoRol";
-import botStatus from "./components/botStatus";
+import gamingChannel from "./components/voice-manager";
+import autoRole from "./components/auto-role";
+import botStatus from "./components/bot-status";
 
 dotenv.config();
 
@@ -19,6 +19,6 @@ db.connect().then(() => {
   });
   client.login(process.env.TOKEN);
   // botStatus.init(client);
-  gamingChannel.init(client);
-  // autoRol.init(client);
+  // gamingChannel.init(client);
+  autoRole.init(client);
 });

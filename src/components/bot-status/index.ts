@@ -1,4 +1,5 @@
 import { Client } from "discord.js";
+import { NEW_MEMBER_ROLE } from "../../util/constants";
 
 const init = async (client: Client) => {
   // When the bot is ready and starts
@@ -13,6 +14,10 @@ const init = async (client: Client) => {
       ],
     });
     console.log("BotStatus module initiated...");
+  });
+  client.on("guildMemberAdd", (member) => {
+    console.log(`New member ${member.displayName} added to the guild`);
+    member.roles.add(NEW_MEMBER_ROLE);
   });
 };
 
