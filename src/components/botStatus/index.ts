@@ -1,21 +1,19 @@
-import { Client, GuildChannel, TextChannel } from 'discord.js';
-import chalk from 'chalk';
+import { Client } from "discord.js";
 
 const init = async (client: Client) => {
-  console.log(chalk.yellowBright('Module BotStatus initiated'));
-
   // When the bot is ready and starts
-  client.on('ready', async () => {
+  client.on("ready", async () => {
     client.user?.setPresence({
-      status: 'online',
-      activity: {
-        name: 'Rehab™',
-        type: 'WATCHING',
-      },
+      status: "online",
+      activities: [
+        {
+          name: "Rehab™",
+          type: "WATCHING",
+        },
+      ],
     });
+    console.log("BotStatus module initiated...");
   });
-
-  client.on('error', (err) => {});
 };
 
 export default {

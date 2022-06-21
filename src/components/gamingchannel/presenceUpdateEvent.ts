@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { GuildChannel, Presence } from 'discord.js';
 import { Videogame } from '../../models';
 import { GamingChannelModel } from '../../models/GamingChannel';
@@ -10,21 +9,21 @@ import {
 } from '../../util';
 
 const checkChannelName = async (channel: GuildChannel) => {
-  let databaseChannel = await GamingChannelModel.findOne({ channelId: channel.id });
+  const databaseChannel = await GamingChannelModel.findOne({ channelId: channel.id });
   let videogames: Videogame[] | null = [];
   if (!databaseChannel?.hasChanged) {
     videogames = getChannelPlayedVideogames(channel);
-    if ((videogames?.length && videogames[0].name != channel.name) || !videogames?.length) {
+    if ((videogames?.length && videogames[0].name !== channel.name) || !videogames?.length) {
       await databaseChannel?.updateOne({ hasChanged: true });
       changeChannelName(channel, `🔊︱${getRandomNameFromThemeNames()}`);
     }
   }
 };
 
-const presenceUpdateEvent = async (oldPresence: Presence | undefined) => {
-  let member = oldPresence?.member;
+const presenceUpdateEvent = async (oldPresence: Presence | null) => {
+  const member = oldPresence?.member;
   if (member) {
-    let channel = await isMemberCreatorOfAChannel(member);
+    const channel = await isMemberCreatorOfAChannel(member);
     if (channel) {
       checkChannelName(channel);
     }

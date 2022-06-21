@@ -4,9 +4,9 @@
   "description": "Games utilities for Discord",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./public/index.js",
-    "ts": "tsc -w",
-    "populateRol": "node populate.js"
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch"
   },
   "keywords": [
     "discord",
@@ -17,8 +17,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.170",
     "@types/mongoose": "^5.10.5",
-    "chalk": "^4.1.1",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.8.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.21",
     "mongoose": "^5.12.7",
@@ -26,6 +25,8 @@
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
-    "@types/node": "^15.0.1"
+    "@types/node": "^15.0.1",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
   }
 }

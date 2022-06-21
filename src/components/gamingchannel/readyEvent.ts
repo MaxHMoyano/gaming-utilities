@@ -1,26 +1,32 @@
-import { Client, GuildChannel } from 'discord.js';
-import { findServer, findVoiceCategory } from '../../util';
-const readyEvent = async (
-  client: Client,
-  voiceCategory: GuildChannel | undefined,
-  createPartyChannel: GuildChannel | undefined,
-) => {
-  const server = findServer(client);
-  voiceCategory = findVoiceCategory(server);
-  let isChannelAlreadyCreated = voiceCategory?.guild.channels.cache.find(
-    (channel) => channel.name === '🤖︱Crear Party',
-  );
-  if (!isChannelAlreadyCreated) {
-    createPartyChannel = await voiceCategory?.guild.channels.create('🤖︱Crear Party', {
-      type: 'voice',
-      userLimit: 1,
-      parent: voiceCategory,
-      position: 2,
+import { Client } from "discord.js";
+import { GamingChannelModel } from "../../models/GamingChannel";
+import {
+  findGuildByClient,
+  findVoiceCategory,
+  findVoiceManagerChannel,
+} from "../../util";
+import { VOICE_MANAGER_CHANNEL_NAME } from "../../util/constants";
+
+const readyEvent = async (client: Client) => {
+  const server = findGuildByClient(client);
+  const voiceCategory = await findVoiceCategory(server);
+  let voiceManagerChannel = await findVoiceManagerChannel();
+  if (!voiceManagerChannel) {
+    let channel = await voiceCategory?.createChannel(
+      VOICE_MANAGER_CHANNEL_NAME,
+      {
+        type: "GUILD_VOICE",
+        userLimit: 1,
+        position: 2,
+      }
+    );
+    await GamingChannelModel.create({
+      channelId: channel?.id,
+      hasChanged: false,
+      creator: "bot",
+      role: "voice",
     });
-  } else {
-    createPartyChannel = isChannelAlreadyCreated;
   }
-  return [voiceCategory, createPartyChannel];
 };
 
 export default readyEvent;
