@@ -1,5 +1,5 @@
 export interface Videogame {
-  id?: string;
+  id?: string | null;
   name?: string;
   count: number;
 }

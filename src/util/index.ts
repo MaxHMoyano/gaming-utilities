@@ -1,36 +1,44 @@
-import { Client, Guild, Activity, GuildChannel, GuildMember, TextChannel } from 'discord.js';
-import { Videogame } from '../models';
-import { GamingChannelModel } from '../models/GamingChannel';
-import _ from 'lodash';
-import { MAIN_CHAT_ID } from './constants';
-import { MessageModel } from '../models/Message';
+import {
+  Client,
+  Guild,
+  Activity,
+  GuildChannel,
+  GuildMember,
+  TextChannel,
+  NonThreadGuildBasedChannel,
+  CategoryChannel,
+} from "discord.js";
+import { sample } from "lodash";
+import { Videogame } from "../models";
+import { GamingChannelModel } from "../models/GamingChannel";
+import { MAIN_CHAT_ID, VOICE_CATEGORY } from "./constants";
+import { MessageModel } from "../models/Message";
+
 const themeNames: string[] = [
-  'Cocina',
-  'Comedor',
-  'Living',
-  'Dormitorio Grande',
-  'Dormitorio chiquito',
-  'Sala de estar',
-  'Sex dungeon',
-  'Patio',
-  'Quincho',
-  'Terraza',
-  'Pasillo',
-  'Sotano',
-  'Casita del arbol',
-  'Desvan',
-  'Ático',
-  'Balcon',
-  'Escalera',
-  'Jardín',
-  'Garage',
-  'Patio trasero',
-  'Vestíbulo',
+  "Cocina",
+  "Comedor",
+  "Living",
+  "Dormitorio Grande",
+  "Dormitorio chiquito",
+  "Sala de estar",
+  "Sex dungeon",
+  "Patio",
+  "Quincho",
+  "Terraza",
+  "Pasillo",
+  "Sotano",
+  "Casita del arbol",
+  "Desvan",
+  "Ático",
+  "Balcon",
+  "Escalera",
+  "Jardín",
+  "Garage",
+  "Patio trasero",
+  "Vestíbulo",
 ];
 
-export const getRandomNameFromThemeNames = () => {
-  return _.sample(themeNames);
-};
+export const getRandomNameFromThemeNames = () => sample(themeNames);
 
 export const changeChannelName = (channel: GuildChannel, name: string) => {
   if (channel.name !== name) {
@@ -38,25 +46,28 @@ export const changeChannelName = (channel: GuildChannel, name: string) => {
   }
 };
 
-export const findServer = (client?: Client): Guild | undefined => {
-  return client?.guilds.cache.first();
-};
+export const findGuildByClient = (client?: Client): Guild | undefined =>
+  client?.guilds.cache.first();
 
-export const findVoiceCategory = (server?: Guild) => {
-  return server?.channels.cache.find((channel) => {
-    return channel.id === '377818324559593486';
-  });
-};
+export const findVoiceCategory = async (server?: Guild) =>
+  (await server?.channels.fetch(VOICE_CATEGORY)) as CategoryChannel;
 
-export const findBotCategory = (server?: Guild) => {
-  return server?.channels.cache.get(MAIN_CHAT_ID);
-};
+export const findMainCategory = async (server?: Guild) =>
+  (await server?.channels.fetch(MAIN_CHAT_ID)) as CategoryChannel;
 
-export const isTextChannelAlreadyCreated = (server?: Guild, name?: string) => {
-  let channel = server?.channels.cache.find((e) => e.name === name) as TextChannel;
+export const findVoiceManagerChannel = async () =>
+  await GamingChannelModel.findOne({ role: "voice" });
+
+export const findAutoRoleChannel = async () =>
+  await GamingChannelModel.findOne({ role: "autorole" });
+
+export const isChannelAlreadyCreated = (guild?: Guild, name?: string) => {
+  const channel = guild?.channels.cache.find((e) => e.name === name);
   return channel;
 };
-export const deleteOldMessagesFromChannel = async (channel: TextChannel | undefined) => {
+export const deleteOldMessagesFromChannel = async (
+  channel: TextChannel | undefined
+) => {
   if (channel) {
     const previousMessages = await channel?.messages.fetch();
     if (previousMessages) {
@@ -68,20 +79,24 @@ export const deleteOldMessagesFromChannel = async (channel: TextChannel | undefi
 
 export const getChannelPlayedVideogames = (channel: GuildChannel) => {
   let videogames: Videogame[] = [];
-  let activities: Activity[] = [];
+  const activities: Activity[] = [];
   channel?.members.forEach((member) => {
-    let memberGames = member.presence.activities.filter((activity) => activity.type === 'PLAYING');
-    if (memberGames.length) {
+    const memberGames = member.presence?.activities.filter(
+      (activity) => activity.type === "PLAYING"
+    );
+    if (memberGames && memberGames.length) {
       activities.push(...memberGames);
     }
   });
   if (activities.length) {
     activities.forEach((activity) => {
-      let gameIdx = videogames.findIndex((videogame) => videogame.id === activity.applicationID);
+      const gameIdx = videogames.findIndex(
+        (videogame) => videogame.id === activity.applicationId
+      );
       if (gameIdx === -1) {
         videogames.push({
           name: activity.name,
-          id: activity.applicationID as string,
+          id: activity.applicationId,
           count: 1,
         });
       } else {
@@ -97,22 +112,11 @@ export const getChannelPlayedVideogames = (channel: GuildChannel) => {
 };
 
 export const isMemberPartOfCreatedChannels = async (
-  member: GuildMember,
-): Promise<GuildChannel | undefined | null> => {
-  let dbChannel = await GamingChannelModel.findOne({ creator: member.id });
+  member: GuildMember
+): Promise<NonThreadGuildBasedChannel | null> => {
+  const dbChannel = await GamingChannelModel.findOne({ creator: member.id });
   if (dbChannel) {
-    return member.guild.channels.cache.get(dbChannel.channelId);
+    return await member.guild.channels.fetch(dbChannel.channelId);
   }
   return null;
-};
-
-export default {
-  getRandomNameFromThemeNames,
-  findServer,
-  changeChannelName,
-  findVoiceCategory,
-  findBotCategory,
-  isTextChannelAlreadyCreated,
-  deleteOldMessagesFromChannel,
-  getChannelPlayedVideogames,
 };

@@ -6,9 +6,10 @@
   "exclude": ["node_modules", "**/*.spec.ts"],
   "compilerOptions": {
     "lib": ["es2020"],
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "target": "es2020",
-    "outDir": "public/",
+    "outDir": "dist/",
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

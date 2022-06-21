@@ -1,15 +1,16 @@
-import mongoose from 'mongoose';
-import chalk from 'chalk';
+import mongoose from "mongoose";
 
-export const connect = async () => {
-  const conn = await mongoose.connect(process.env.MONGO_URI as string, {
+const connect = async () => {
+  const connect = await mongoose.connect(process.env.MONGO_URI as string, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
   });
-  console.log(chalk.bold.underline.blue(`Mongo DB connected ${conn.connection.host}`));
-  return;
+  console.log(
+    `Connection to database established with`,
+    connect.connection.host
+  );
 };
 
 export default { connect };
