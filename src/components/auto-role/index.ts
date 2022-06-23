@@ -42,7 +42,7 @@ const init = async (client: Client) => {
   client.on("roleDelete", async (role) => {
     if (role.name.includes("g: ")) {
       const guild = findGuildByClient(client);
-      await onReady(guild);
+      await onReady(guild, true);
     }
   });
 };

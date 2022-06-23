@@ -10,7 +10,10 @@ import {
 } from "../../util";
 import { ROLES_ORDER } from "../../util/constants";
 
-export const onReady = async (guild: Guild | undefined) => {
+export const onReady = async (
+  guild: Guild | undefined,
+  overwrite?: boolean
+) => {
   if (guild) {
     const autoRoleChannel = await getAutoRoleChannel(guild);
     const gameRoles = getGuildGameRoles(guild);
@@ -18,7 +21,7 @@ export const onReady = async (guild: Guild | undefined) => {
     const doMessagesAlreadyExists = await verifyExistingMessages(
       autoRoleChannel
     );
-    if (roles.length && !doMessagesAlreadyExists) {
+    if (roles.length && (!doMessagesAlreadyExists || overwrite)) {
       await deleteOldMessagesFromChannel(autoRoleChannel);
       let j = 0;
       for (let i = 1; i <= Math.ceil(roles.length / 20); i++) {
