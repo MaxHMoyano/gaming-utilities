@@ -15,7 +15,6 @@ const voiceUpdateEvent = async (
     newVoiceState.channel &&
     newVoiceState.channel.id === dbVoiceManagerChannel.channelId
   ) {
-    debugger;
     let videogames = newVoiceState.member?.presence?.activities.filter(
       (activity) => activity.type === "PLAYING"
     );

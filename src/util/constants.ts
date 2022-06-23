@@ -1,6 +1,7 @@
 export const BOT_ID = "720067757412188181";
 export const MAIN_CHAT_ID = "377818324559593484";
 export const VOICE_CATEGORY = "377818324559593486";
+export const NEW_MEMBER_ROLE = "959161201143717928";
 export const AUTO_ROLE_DESCRIPTION =
   "\n\nReacciona para conseguir el rol!\n\n\n";
 export const VOICE_MANAGER_CHANNEL_NAME = "🤖︱Crear Party";

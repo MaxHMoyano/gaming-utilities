@@ -7,11 +7,17 @@ import {
   TextChannel,
   NonThreadGuildBasedChannel,
   CategoryChannel,
+  Permissions,
 } from "discord.js";
 import { sample } from "lodash";
 import { Videogame } from "../models";
 import { GamingChannelModel } from "../models/GamingChannel";
-import { MAIN_CHAT_ID, VOICE_CATEGORY } from "./constants";
+import {
+  AUTO_ROLE_CHANNEL_NAME,
+  AUTO_ROLE_DESCRIPTION,
+  MAIN_CHAT_ID,
+  VOICE_CATEGORY,
+} from "./constants";
 import { MessageModel } from "../models/Message";
 
 const themeNames: string[] = [
@@ -58,7 +64,7 @@ export const findMainCategory = async (server?: Guild) =>
 export const findVoiceManagerChannel = async () =>
   await GamingChannelModel.findOne({ role: "voice" });
 
-export const findAutoRoleChannel = async () =>
+export const findAutoRoleDbChannel = async () =>
   await GamingChannelModel.findOne({ role: "autorole" });
 
 export const isChannelAlreadyCreated = (guild?: Guild, name?: string) => {
@@ -119,4 +125,54 @@ export const isMemberPartOfCreatedChannels = async (
     return await member.guild.channels.fetch(dbChannel.channelId);
   }
   return null;
+};
+
+export const getGuildGameRoles = (guild: Guild) => {
+  let gameRoles = guild?.roles.cache.filter((role) => {
+    return role.name.includes("g: ");
+  });
+  return [...gameRoles.values()];
+};
+
+export const convertCharToEmoji = (char: string) =>
+  String.fromCodePoint((char.codePointAt(0) as number) - 65 + 0x1f1e6);
+
+export const getAutoRoleChannel = async (
+  guild: Guild | undefined
+): Promise<TextChannel> => {
+  const mainCategory = await findMainCategory(guild);
+  const dbAutoRoleChannel = await findAutoRoleDbChannel();
+  if (dbAutoRoleChannel) {
+    try {
+      return (await guild?.channels.fetch(
+        dbAutoRoleChannel.channelId
+      )) as TextChannel;
+    } catch (error) {
+      await GamingChannelModel.findOneAndDelete({ role: "autorole" });
+    }
+  }
+  let autoRoleChannel = await mainCategory.createChannel(
+    AUTO_ROLE_CHANNEL_NAME,
+    {
+      type: "GUILD_TEXT",
+      topic: AUTO_ROLE_DESCRIPTION,
+      position: 1,
+      permissionOverwrites: [
+        {
+          id: guild?.roles.everyone.id as string,
+          deny: [
+            Permissions.FLAGS.ADD_REACTIONS,
+            Permissions.FLAGS.SEND_MESSAGES,
+          ],
+        },
+      ],
+    }
+  );
+  await GamingChannelModel.create({
+    channelId: autoRoleChannel?.id,
+    hasChanged: false,
+    creator: "bot",
+    role: "autorole",
+  });
+  return autoRoleChannel;
 };
